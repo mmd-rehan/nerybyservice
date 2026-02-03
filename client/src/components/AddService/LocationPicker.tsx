@@ -1,7 +1,7 @@
-import { FC, useState, useMemo, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Circle, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { type FC, useMemo, useRef } from 'react';
+import { Circle, MapContainer, Marker, TileLayer } from 'react-leaflet';
 
 // Fix for default marker icon in Leaflet + React
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';

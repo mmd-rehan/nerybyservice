@@ -1,23 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useUserLocation } from '../hooks/useUserLocation';
 import { SearchHero } from '../components/Search/SearchHero';
 import { ResultsList } from '../components/Search/ResultsList';
 import { ResultsMap } from '../components/Search/ResultsMap';
 import { Button } from '../components/ui/Button';
-import { searchServices } from '../api/serviceApi';
+import { searchServices, type Service } from '../api/serviceApi';
 import { Map, List, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Home = () => {
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-    const [results, setResults] = useState<any[]>([]);
+    const [results, setResults] = useState<Service[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const { location: autoLocation } = useUserLocation();
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>(undefined);
     const [locationName, setLocationName] = useState('');
 
-    // Fetch initial results once on mount
+    // Update userLocation when autoLocation is available and search
     useEffect(() => {
-        performSearch('');
-    }, []);
+        if (autoLocation) {
+            setUserLocation(autoLocation);
+            setLocationName('Nearby'); // Set a default name or handle reverse geocoding
+            performSearch('', autoLocation.lat, autoLocation.lng);
+        } else {
+            // Initial search if no location yet (or waiting for it)
+            // performSearch(''); // Optional: might want to wait slightly or just search global first
+            if (!userLocation) performSearch('');
+        }
+    }, [autoLocation]);
 
     const performSearch = async (query: string, lat?: number, lng?: number) => {
         setIsLoading(true);
@@ -61,7 +71,7 @@ export const Home = () => {
         );
     }, []);
 
-    const handleSearch = (query: string, locationText?: string) => {
+    const handleSearch = (query: string, _locationText?: string) => {
         // Implement logic to handle "locationText" (e.g., geocoding API)
         // For now, we assume userLocation is used if set
         performSearch(query);
@@ -87,8 +97,8 @@ export const Home = () => {
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${viewMode === 'list'
-                                        ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
-                                        : 'text-gray-500 hover:text-gray-900'
+                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
+                                    : 'text-gray-500 hover:text-gray-900'
                                     }`}
                             >
                                 <List className="w-4 h-4" />
@@ -97,8 +107,8 @@ export const Home = () => {
                             <button
                                 onClick={() => setViewMode('map')}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${viewMode === 'map'
-                                        ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
-                                        : 'text-gray-500 hover:text-gray-900'
+                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
+                                    : 'text-gray-500 hover:text-gray-900'
                                     }`}
                             >
                                 <Map className="w-4 h-4" />
@@ -121,7 +131,7 @@ export const Home = () => {
                 ) : (
                     <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
                         <ResultsMap
-                            services={results.map((r: any) => ({
+                            services={results.map((r) => ({
                                 id: r._id,
                                 title: r.serviceTitle,
                                 category: r.category,
