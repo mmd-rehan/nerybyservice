@@ -1,8 +1,9 @@
 import { type FC } from 'react';
 import { ServiceCard } from './ServiceCard';
+import type { Service } from '../../api/serviceApi';
 
 interface ResultsListProps {
-    results: any[]; // Using any for now, should match API type
+    results: Service[];
 }
 
 export const ResultsList: FC<ResultsListProps> = ({ results }) => {

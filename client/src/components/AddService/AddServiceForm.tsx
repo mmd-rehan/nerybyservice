@@ -1,5 +1,6 @@
 import { Briefcase, CheckCircle, Globe, MapPin, MessageCircle, Phone } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUserLocation } from '../../hooks/useUserLocation';
 import { createService, type ServiceData } from '../../api/serviceApi';
 import { OtpModal } from '../Auth/OtpModal';
 import { Button } from '../ui/Button';
@@ -31,7 +32,18 @@ export const AddServiceForm = () => {
     });
 
     // Location State
-    const [location, setLocation] = useState({ lat: 40.7128, lng: -74.0060 });
+    const DEFAULT_LOCATION = { lat: 40.7128, lng: -74.0060 };
+
+    const [location, setLocation] = useState(DEFAULT_LOCATION);
+    const { location: userLocation } = useUserLocation();
+
+    // Update location when userLocation is fetched
+    useEffect(() => {
+        if (userLocation) {
+            setLocation(userLocation);
+        }
+    }, [userLocation]);
+
     const [radius, setRadius] = useState(5000); // 5km default
 
     const [isOtpOpen, setIsOtpOpen] = useState(false);

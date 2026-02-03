@@ -19,6 +19,14 @@ export interface ServiceData {
     phoneNumber: string; // Including top-level phoneNumber as required by schema
 }
 
+export interface Service extends ServiceData {
+    _id: string;
+    distance?: number; // Calculated field from text search or geo query
+    status: 'pending' | 'approved';
+    createdAt: string;
+    updatedAt: string;
+}
+
 export const createService = async (data: ServiceData) => {
     const response = await axios.post(`${API_URL}/services`, data);
     return response.data;
