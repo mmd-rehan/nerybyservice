@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { type FC, useMemo, useRef } from 'react';
-import { Circle, MapContainer, Marker, TileLayer } from 'react-leaflet';
+import { type FC, useMemo, useRef, useEffect } from 'react';
+import { Circle, MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 
 // Fix for default marker icon in Leaflet + React
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -21,6 +21,14 @@ interface LocationPickerProps {
     radius: number;
     onRadiusChange: (val: number) => void;
 }
+
+const MapUpdater: FC<{ center: { lat: number; lng: number } }> = ({ center }) => {
+    const map = useMap();
+    useEffect(() => {
+        map.setView(center, map.getZoom());
+    }, [center, map]);
+    return null;
+};
 
 const DraggableMarker: FC<{
     position: { lat: number; lng: number };
@@ -72,6 +80,7 @@ export const LocationPicker: FC<LocationPickerProps> = ({ value, onChange, radiu
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
+                    <MapUpdater center={value} />
                     <DraggableMarker position={value} onChange={onChange} />
                     <Circle center={value} radius={radius} pathOptions={{ fillColor: 'blue', fillOpacity: 0.1, color: 'blue', weight: 1 }} />
                 </MapContainer>

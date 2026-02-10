@@ -44,7 +44,7 @@ export const AddServiceForm = () => {
         }
     }, [userLocation]);
 
-    const [radius, setRadius] = useState(5000); // 5km default
+    const [radius, setRadius] = useState(5000); 
 
     const [isOtpOpen, setIsOtpOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
