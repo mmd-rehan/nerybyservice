@@ -42,9 +42,11 @@ export const useUserLocation = (): UseUserLocationResult => {
                 }
             }
 
-            // 2. Fallback to IP-based location
+            // 2. Fallback to IP-based location via Backend
             try {
-                const response = await fetch('https://ipapi.co/json/');
+                // Assuming Vite proxy is set up or backend is on the same domain/port for production
+                // If strictly local dev without proxy, might need full URL, but refined approach is relative.
+                const response = await fetch('http://localhost:3030/api/location');
                 if (!response.ok) {
                     throw new Error('Failed to fetch IP location');
                 }

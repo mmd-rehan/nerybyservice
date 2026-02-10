@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import serviceRoutes from './routes/serviceRoutes';
+import locationRoutes from './routes/locationRoutes';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api', serviceRoutes);
+app.use('/api/location', locationRoutes);
 
 // Health check
 app.get('/', (req, res) => {
