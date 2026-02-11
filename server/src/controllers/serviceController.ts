@@ -6,6 +6,7 @@ export const createService = async (req: Request, res: Response) => {
     try {
         // 1. Validate Input
         const validatedData = ServiceSchemaZod.parse(req.body);
+        console.log(validatedData)
 
         // 2. Create Service
         // Mock OTP check: In a real app, we'd verify a code here.
@@ -17,6 +18,7 @@ export const createService = async (req: Request, res: Response) => {
             data: service,
         });
     } catch (error: any) {
+        console.error(error);
         if (error instanceof z.ZodError) {
             // Cast to any to avoid TS error with .errors vs .issues depending on version/types
             return res.status(400).json({ success: false, errors: (error as any).errors });

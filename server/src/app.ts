@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api', serviceRoutes);
-app.use('/api/location', locationRoutes);
+app.use('/api', locationRoutes);
 
 // Health check
 app.get('/', (req, res) => {
