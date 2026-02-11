@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../api/axios'; // Import centralized axios instance
 
 interface Location {
     lat: number;
@@ -44,13 +45,8 @@ export const useUserLocation = (): UseUserLocationResult => {
 
             // 2. Fallback to IP-based location via Backend
             try {
-                // Assuming Vite proxy is set up or backend is on the same domain/port for production
-                // If strictly local dev without proxy, might need full URL, but refined approach is relative.
-                const response = await fetch('http://localhost:3030/api/location');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch IP location');
-                }
-                const data = await response.json();
+                const response = await api.get('/location'); // Use centralized axios instance
+                const data = response.data;
 
                 if (data.latitude && data.longitude) {
                     setLocation({

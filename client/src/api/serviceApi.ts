@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:3030/api';
+import api from './axios';
 
 export interface ServiceData {
     serviceTitle: string;
@@ -21,14 +19,13 @@ export interface ServiceData {
 
 export interface Service extends ServiceData {
     _id: string;
-    distance?: number; // Calculated field from text search or geo query
-    status: 'pending' | 'approved';
+    distance?: number; 
     createdAt: string;
     updatedAt: string;
 }
 
 export const createService = async (data: ServiceData) => {
-    const response = await axios.post(`${API_URL}/services`, data);
+    const response = await api.post('/services', data);
     return response.data;
 };
 
@@ -40,6 +37,6 @@ export interface SearchParams {
 }
 
 export const searchServices = async (params: SearchParams) => {
-    const response = await axios.get(`${API_URL}/search`, { params });
+    const response = await api.get('/search', { params });
     return response.data;
 };
