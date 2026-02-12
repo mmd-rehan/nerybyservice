@@ -84,6 +84,20 @@ export const searchServices = async (req: Request, res: Response) => {
                     status: 'approved',
                 },
             },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'category',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$category',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
         ];
 
         if (text) {
@@ -91,8 +105,8 @@ export const searchServices = async (req: Request, res: Response) => {
                 $match: {
                     $or: [
                         { serviceTitle: { $regex: text, $options: 'i' } },
-                        { category: { $regex: text, $options: 'i' } },
-                        { description: { $regex: text, $options: 'i' } }
+                        { 'category.name': { $regex: text, $options: 'i' } },
+                        { description: { $regex: text, $options: 'i' } },
                     ],
                 },
             });

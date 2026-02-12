@@ -1,11 +1,12 @@
 import { type FC } from 'react';
 import { Phone, MessageCircle, MapPin } from 'lucide-react';
 import { Button } from '../ui/Button';
+import type { Category } from '../../api/categoryApi';
 
 interface ServiceCardProps {
     id: string;
     title: string;
-    category: string;
+    category: Category;
     description: string;
     distance?: number;
     phone: string;
@@ -48,7 +49,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                             <h3 className="font-bold text-gray-900 leading-tight">{title}</h3>
                             <div className="mt-1 flex items-center gap-2">
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                                    {category}
+                                    {category.name}
                                 </span>
                             </div>
                         </div>

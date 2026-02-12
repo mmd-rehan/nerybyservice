@@ -8,6 +8,7 @@ import { Button } from '../ui/Button';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import type { Category } from '../../api/categoryApi';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -39,7 +40,7 @@ const serviceIcon = new L.Icon({
 interface ServiceLocation {
     id: string;
     title: string;
-    category: string;
+    category: Category;
     location: {
         coordinates: [number, number]; // [lng, lat]
     };
@@ -84,7 +85,7 @@ export const ResultsMap: FC<ResultsMapProps> = ({ services, userLocation }) => {
                         <Popup>
                             <div className="min-w-[150px]">
                                 <h3 className="font-bold text-sm">{service.title}</h3>
-                                <p className="text-xs text-gray-500 mb-2">{service.category}</p>
+                                <p className="text-xs text-gray-500 mb-2">{service.category.name}</p>
                                 <a href={`tel:${service.phone}`}>
                                     <Button size="sm" className="w-full text-xs py-1 h-auto">Call</Button>
                                 </a>

@@ -1,8 +1,9 @@
 import api from './axios';
+import type { Category } from './categoryApi';
 
 export interface ServiceData {
     serviceTitle: string;
-    category: string;
+    category: Category;
     language: string;
     description: string;
     location: {

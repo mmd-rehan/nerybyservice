@@ -11,6 +11,8 @@ export const ServiceSchemaZod = z.object({
     phoneNumber: z.string(),
     serviceTitle: z.string(),
     category: z.string(),
+    categoryId: z.string().optional(),
+    categoryName: z.string().optional(),
     location: z.object({
         type: z.literal('Point'),
         coordinates: z.tuple([z.number(), z.number()]), // [lon, lat]
@@ -28,7 +30,7 @@ export type ServiceInput = z.infer<typeof ServiceSchemaZod>;
 export interface IService extends Document {
     phoneNumber: string;
     serviceTitle: string;
-    category: string;
+    category: mongoose.Types.ObjectId; // Reference to Category model
     location: {
         type: 'Point';
         coordinates: number[];
@@ -48,7 +50,8 @@ const ServiceSchema = new Schema<IService>(
     {
         phoneNumber: { type: String, required: true, index: true },
         serviceTitle: { type: String, required: true }, // Text index added below
-        category: { type: String, required: true, index: true },
+        category: { type: Schema.Types.ObjectId, ref: 'Category', required: true, index: true },
+
         location: {
             type: {
                 type: String,
@@ -71,7 +74,7 @@ const ServiceSchema = new Schema<IService>(
             phone: { type: String, required: true },
             whatsapp: { type: String, required: true },
         },
-        language: { type: String, required: true },
+        language: { type: String },
     },
     {
         timestamps: true,
@@ -82,6 +85,6 @@ const ServiceSchema = new Schema<IService>(
 // 2dsphere index for geospatial queries on 'location'
 ServiceSchema.index({ location: '2dsphere' });
 // Text index for search on 'serviceTitle'
-ServiceSchema.index({ serviceTitle: 'text' });
+ServiceSchema.index({ serviceTitle: 'text' }, { language_override: 'none' });
 
 export default mongoose.model<IService>('Service', ServiceSchema);

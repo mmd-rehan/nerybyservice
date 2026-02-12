@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import serviceRoutes from './routes/serviceRoutes';
 import locationRoutes from './routes/locationRoutes';
+import categoryRoutes from './routes/categoryRoutes';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api', serviceRoutes);
 app.use('/api', locationRoutes);
+app.use('/api', categoryRoutes);
 
 // Health check
 app.get('/', (req, res) => {

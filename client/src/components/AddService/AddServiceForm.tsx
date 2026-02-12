@@ -5,31 +5,25 @@ import { createService, type ServiceData } from '../../api/serviceApi';
 import { OtpModal } from '../Auth/OtpModal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
 import { LocationPicker } from './LocationPicker';
+import { CategorySelect } from '../ui/CategorySelect';
 
-const CATEGORIES = [
-    { value: 'Plumber', label: 'Plumber' },
-    { value: 'Electrician', label: 'Electrician' },
-    { value: 'Carpenter', label: 'Carpenter' },
-    { value: 'Mechanic', label: 'Mechanic' },
-    { value: 'Cleaner', label: 'Cleaner' },
-    { value: 'Painter', label: 'Painter' },
-    { value: 'Other', label: 'Other' },
-];
+
+
+
 
 export const AddServiceForm = () => {
     // Form State
     const [formData, setFormData] = useState({
         businessName: '',
-        category: CATEGORIES[0].value,
-        customCategory: '',
+        category: '',
         language: '',
         description: '',
         phone: '',
         whatsapp: '',
     });
+
 
     // Location State
     const DEFAULT_LOCATION = { lat: 40.7128, lng: -74.0060 };
@@ -44,7 +38,7 @@ export const AddServiceForm = () => {
         }
     }, [userLocation]);
 
-    const [radius, setRadius] = useState(5000); 
+    const [radius, setRadius] = useState(5000);
 
     const [isOtpOpen, setIsOtpOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,8 +51,7 @@ export const AddServiceForm = () => {
 
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.businessName || !formData.description || !formData.phone) {
-            alert('Please fill in all required fields');
+        if (!formData.businessName || !formData.description || !formData.phone || !formData.category) {
             return;
         }
         setIsOtpOpen(true);
@@ -72,7 +65,7 @@ export const AddServiceForm = () => {
 
             const payload: ServiceData = {
                 serviceTitle: formData.businessName,
-                category: formData.category === 'Other' ? formData.customCategory : formData.category,
+                category: formData.category,
                 language: formData.language,
                 description: formData.description,
                 phoneNumber: formData.phone,
@@ -91,8 +84,7 @@ export const AddServiceForm = () => {
             setSuccessMessage('Service registered successfully!');
             setFormData({
                 businessName: '',
-                category: CATEGORIES[0].value,
-                customCategory: '',
+                category: '',
                 language: '',
                 description: '',
                 phone: '',
@@ -100,7 +92,7 @@ export const AddServiceForm = () => {
             });
         } catch (error: any) {
             console.error(error);
-            alert('Failed to register service: ' + (error.response?.data?.message || error.message));
+            alert('Failed to register service');
         } finally {
             setIsSubmitting(false);
         }
@@ -157,24 +149,14 @@ export const AddServiceForm = () => {
                                 className="rounded-xl border-gray-200 focus:ring-black"
                             />
                             <div className="space-y-4">
-                                <Select
-                                    label="Category"
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={handleChange}
-                                    options={CATEGORIES}
-                                    className="rounded-xl border-gray-200 focus:ring-black"
-                                />
-                                {formData.category === 'Other' && (
-                                    <Input
-                                        placeholder="Specify category..."
-                                        name="customCategory"
-                                        value={formData.customCategory}
-                                        onChange={handleChange}
-                                        required
-                                        className="rounded-xl border-gray-200 focus:ring-black"
+                                <div className="space-y-4">
+                                    <CategorySelect
+                                        label="Category"
+                                        value={formData.category}
+                                        onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                                     />
-                                )}
+                                </div>
+
                             </div>
                         </div>
 
