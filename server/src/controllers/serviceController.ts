@@ -29,7 +29,9 @@ export const createService = async (req: Request, res: Response) => {
 
 export const searchServices = async (req: Request, res: Response) => {
     try {
-        const { lat, lng, radius, text } = req.query;
+        const { lat, lng, radius, text, query: searchQuery } = req.query;
+        const searchTerm = (text as string) || (searchQuery as string);
+
 
         if (!lat || !lng) {
             return res.status(400).json({ success: false, message: 'Latitude (lat) and Longitude (lng) are required.' });
@@ -39,31 +41,6 @@ export const searchServices = async (req: Request, res: Response) => {
         const longitude = parseFloat(lng as string);
         const radiusInMeters = radius ? parseFloat(radius as string) : 160934; // Default 100 miles ~ 160934 meters
 
-        // Build the query
-        const query: any = {
-            location: {
-                $near: {
-                    $geometry: {
-                        type: 'Point',
-                        coordinates: [longitude, latitude],
-                    },
-                    $maxDistance: radiusInMeters,
-                },
-            },
-            status: 'approved', // Only return approved services
-        };
-
-        // If text search is provided, add regex filter on serviceTitle
-        // Note: $text requires fully text indexed fields and works best with $text operator,
-        // but mixing $text and $near can be tricky or restrictive in some mongo versions/configs.
-        // Using Regex for flexibility on partial matches as requested "Regex or Text search".
-        if (text) {
-            query.$or = [
-                { serviceTitle: { $regex: text, $options: 'i' } },
-                { category: { $regex: text, $options: 'i' } },
-                { description: { $regex: text, $options: 'i' } }
-            ];
-        }
 
         // Since $near sorts by distance automatically, we don't need additional sort.
         // However, $near does not return the calculated distance field in the document unless using aggregation ($geoNear).
@@ -100,17 +77,18 @@ export const searchServices = async (req: Request, res: Response) => {
             },
         ];
 
-        if (text) {
+        if (searchTerm) {
             pipeline.push({
                 $match: {
                     $or: [
-                        { serviceTitle: { $regex: text, $options: 'i' } },
-                        { 'category.name': { $regex: text, $options: 'i' } },
-                        { description: { $regex: text, $options: 'i' } },
+                        { serviceTitle: { $regex: searchTerm, $options: 'i' } },
+                        { 'category.name': { $regex: searchTerm, $options: 'i' } },
+                        { description: { $regex: searchTerm, $options: 'i' } },
                     ],
                 },
             });
         }
+
 
         const services = await Service.aggregate(pipeline);
 
