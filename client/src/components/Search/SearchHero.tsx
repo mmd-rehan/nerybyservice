@@ -1,5 +1,6 @@
-import { MapPin, Search } from 'lucide-react';
-import { type FC, useState, useEffect } from 'react';
+import { Briefcase, Car, Grid, Hammer, MapPin, Paintbrush, Search, Sparkles, Wrench, Zap } from 'lucide-react';
+import { useEffect, useState, type FC } from 'react';
+import { fetchCategories } from '../../api/categoryApi';
 
 interface SearchHeroProps {
     onSearch: (query: string, location?: string) => void;
@@ -7,33 +8,65 @@ interface SearchHeroProps {
     currentLocationName?: string;
 }
 
-const CATEGORIES = [
-    { id: 'all', label: 'All', icon: '🔍' },
-    { id: 'Plumber', label: 'Plumbing', icon: '🔧' },
-    { id: 'Electrician', label: 'Electrical', icon: '⚡' },
-    { id: 'Cleaner', label: 'Cleaning', icon: '✨' },
-    { id: 'Carpenter', label: 'Carpentry', icon: '🪚' },
-    { id: 'Painter', label: 'Painting', icon: '🎨' },
-    { id: 'Mechanic', label: 'Mechanic', icon: '🚗' },
-];
+interface DisplayCategory {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+}
+
+const DEFAULT_CATEGORY: DisplayCategory = { id: 'all', label: 'All', icon: <Grid className="w-4 h-4" /> };
+
+const getCategoryIcon = (name: string) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('plumb')) return <Wrench className="w-4 h-4" />;
+    if (lower.includes('electr')) return <Zap className="w-4 h-4" />;
+    if (lower.includes('clean')) return <Sparkles className="w-4 h-4" />;
+    if (lower.includes('carpent')) return <Hammer className="w-4 h-4" />;
+    if (lower.includes('paint')) return <Paintbrush className="w-4 h-4" />;
+    if (lower.includes('mechanic')) return <Car className="w-4 h-4" />;
+    return <Briefcase className="w-4 h-4" />;
+};
 
 export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, currentLocationName }) => {
     const [searchText, setSearchText] = useState('');
     const [locationText, setLocationText] = useState(currentLocationName || '');
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [categories, setCategories] = useState<DisplayCategory[]>([DEFAULT_CATEGORY]);
 
     // Update local state if prop changes (e.g. geolocation found)
     useEffect(() => {
         if (currentLocationName) setLocationText(currentLocationName);
     }, [currentLocationName]);
 
+    // Fetch categories
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                const data = await fetchCategories();
+                const formatted: DisplayCategory[] = data.map(cat => ({
+                    id: cat._id, // Use _id as the search key
+                    label: cat.name,
+                    icon: getCategoryIcon(cat.name)
+                }));
+                setCategories([DEFAULT_CATEGORY, ...formatted]);
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+            }
+        };
+        loadCategories();
+    }, []);
+
     const handleSearchSubmit = () => {
         onSearch(searchText === 'all' ? '' : searchText, locationText);
     };
 
-    const handleCategoryClick = (catId: string) => {
+    const handleCategoryClick = (catId: string, label: string) => {
         setSelectedCategory(catId);
-        onSearch(catId === 'all' ? '' : catId, locationText);
+        // If "All" is selected, clear search. Otherwise use the ID or Name.
+        // The backend search might expect a name or ID. 
+        // Based on previous tasks, the search on backend checks `category.name` or `serviceTitle`.
+        // So we should probably pass the category name (label) as the query if it's not 'all'.
+        onSearch(catId === 'all' ? '' : label, locationText);
     };
 
     return (
@@ -86,10 +119,10 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, c
 
                 {/* Categories */}
                 <div className="flex flex-wrap justify-center gap-3">
-                    {CATEGORIES.map((cat) => (
+                    {categories.map((cat) => (
                         <button
                             key={cat.id}
-                            onClick={() => handleCategoryClick(cat.id)}
+                            onClick={() => handleCategoryClick(cat.id, cat.label)}
                             className={`
                                 flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all border
                                 ${selectedCategory === cat.id
@@ -97,7 +130,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, c
                                     : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}
                             `}
                         >
-                            <span className="mr-2">{cat.icon}</span>
+                            <span className="mr-2 flex items-center">{cat.icon}</span>
                             {cat.label}
                         </button>
                     ))}
