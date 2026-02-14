@@ -6,14 +6,14 @@ import { ResultsMap } from '../components/Search/ResultsMap';
 import { ShimmerCard } from '../components/Search/ShimmerCard';
 import { Button } from '../components/ui/Button';
 import { searchServices, type Service } from '../api/serviceApi';
-import { Map, List, Plus } from 'lucide-react';
+import { Map, List, Plus, MapPin, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Home = () => {
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
     const [results, setResults] = useState<Service[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const { location: autoLocation } = useUserLocation();
+    const { location: autoLocation, permissionDenied, retry: retryLocation } = useUserLocation();
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>(undefined);
     const [locationName, setLocationName] = useState('');
 
@@ -67,6 +67,27 @@ export const Home = () => {
             />
 
             <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8">
+                {/* Location Permission Banner */}
+                {permissionDenied && !autoLocation && (
+                    <div className="mb-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 animate-start animate-fadeInUp">
+                        <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                                <MapPin className="w-5 h-5 text-amber-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-amber-900">Location access blocked</p>
+                                <p className="text-xs text-amber-700">Enable location to discover services near you. You may need to allow it in your browser settings first.</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={retryLocation}
+                            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow-md"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                            Enable Location
+                        </button>
+                    </div>
+                )}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-start animate-fadeInUp anim-delay-3">
                     <h2 className="text-xl font-bold text-gray-900">
                         {isLoading ? 'Searching...' : `${results.length} providers`}

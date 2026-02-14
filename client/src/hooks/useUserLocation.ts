@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios'; // Import centralized axios instance
 
 interface Location {
@@ -10,12 +10,24 @@ interface UseUserLocationResult {
     location: Location | null;
     loading: boolean;
     error: string | null;
+    permissionDenied: boolean;
+    retry: () => void;
 }
 
 export const useUserLocation = (): UseUserLocationResult => {
     const [location, setLocation] = useState<Location | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [permissionDenied, setPermissionDenied] = useState<boolean>(false);
+    const [attempt, setAttempt] = useState(0);
+
+    const retry = useCallback(() => {
+        setLocation(null);
+        setError(null);
+        setPermissionDenied(false);
+        setLoading(true);
+        setAttempt((prev) => prev + 1);
+    }, []);
 
     useEffect(() => {
         const fetchLocation = async () => {
@@ -36,9 +48,12 @@ export const useUserLocation = (): UseUserLocationResult => {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     });
+                    setPermissionDenied(false);
                     setLoading(false);
                     return;
-                } catch (err) {
+                } catch (err: any) {
+                    const isDenied = err?.code === 1; // GeolocationPositionError.PERMISSION_DENIED
+                    setPermissionDenied(isDenied);
                     console.warn("Geolocation failed or denied, falling back to IP location.", err);
                 }
             }
@@ -65,7 +80,7 @@ export const useUserLocation = (): UseUserLocationResult => {
         };
 
         fetchLocation();
-    }, []);
+    }, [attempt]);
 
-    return { location, loading, error };
+    return { location, loading, error, permissionDenied, retry };
 };
