@@ -15,6 +15,17 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
+// Custom black/yellow marker icon
+const customIcon = L.divIcon({
+    className: 'custom-marker',
+    html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" style="transform: translate(-50%, -100%);">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#000000"/>
+        <circle cx="12" cy="9" r="2.5" fill="#FFC107"/>
+    </svg>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+});
+
 interface LocationPickerProps {
     value: { lat: number; lng: number };
     onChange: (val: { lat: number; lng: number }) => void;
@@ -54,6 +65,7 @@ const DraggableMarker: FC<{
             eventHandlers={eventHandlers}
             position={position}
             ref={markerRef}
+            icon={customIcon}
         />
     );
 };
@@ -77,12 +89,12 @@ export const LocationPicker: FC<LocationPickerProps> = ({ value, onChange, radiu
             <div className="h-[400px] w-full rounded-xl overflow-hidden shadow-md border border-gray-300 z-0 relative">
                 <MapContainer center={value} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                     <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                     />
                     <MapUpdater center={value} />
                     <DraggableMarker position={value} onChange={onChange} />
-                    <Circle center={value} radius={radius} pathOptions={{ fillColor: 'blue', fillOpacity: 0.1, color: 'blue', weight: 1 }} />
+                    <Circle center={value} radius={radius} pathOptions={{ fillColor: 'black', fillOpacity: 0.1, color: 'black', weight: 1 }} />
                 </MapContainer>
             </div>
             <p className="text-sm text-gray-500 text-center">Drag the marker to pinpoint your location.</p>
