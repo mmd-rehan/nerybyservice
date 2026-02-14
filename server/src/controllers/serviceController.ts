@@ -6,7 +6,6 @@ export const createService = async (req: Request, res: Response) => {
     try {
         // 1. Validate Input
         const validatedData = ServiceSchemaZod.parse(req.body);
-        console.log(validatedData)
 
         // 2. Create Service
         // Mock OTP check: In a real app, we'd verify a code here.

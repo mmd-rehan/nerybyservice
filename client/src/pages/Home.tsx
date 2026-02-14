@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { SearchHero } from '../components/Search/SearchHero';
 import { ResultsList } from '../components/Search/ResultsList';
@@ -51,27 +51,9 @@ export const Home = () => {
         }
     };
 
-    const handleLocationRequest = useCallback(() => {
-        if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser');
-            return;
-        }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                setUserLocation({ lat: latitude, lng: longitude });
-                setLocationName('Current Location'); // In a real app, reverse geocode here
-                performSearch('', latitude, longitude); // Refresh results with new location
-            },
-            (error) => {
-                console.error('Error getting location:', error);
-                alert('Could not access location. Please enable permissions.');
-            }
-        );
-    }, []);
 
-    const handleSearch = (query: string, _locationText?: string) => {
+    const handleSearch = (query: string) => {
         // Implement logic to handle "locationText" (e.g., geocoding API)
         // For now, we assume userLocation is used if set
         performSearch(query);
@@ -81,7 +63,6 @@ export const Home = () => {
         <div className="min-h-screen bg-gray-50 pb-20 font-sans">
             <SearchHero
                 onSearch={handleSearch}
-                onLocationRequest={handleLocationRequest}
                 currentLocationName={locationName}
             />
 

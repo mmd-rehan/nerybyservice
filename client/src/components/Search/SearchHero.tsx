@@ -1,10 +1,10 @@
-import { Briefcase, Car, Grid, Hammer, MapPin, Paintbrush, Search, Sparkles, Wrench, Zap } from 'lucide-react';
+import { Briefcase, Car, Grid, Hammer, Paintbrush, Search, Sparkles, Wrench, Zap } from 'lucide-react';
+
 import { useEffect, useState, type FC } from 'react';
 import { fetchCategories } from '../../api/categoryApi';
 
 interface SearchHeroProps {
     onSearch: (query: string, location?: string) => void;
-    onLocationRequest: () => void;
     currentLocationName?: string;
 }
 
@@ -27,16 +27,13 @@ const getCategoryIcon = (name: string) => {
     return <Briefcase className="w-4 h-4" />;
 };
 
-export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, currentLocationName }) => {
+export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName }) => {
     const [searchText, setSearchText] = useState('');
-    const [locationText, setLocationText] = useState(currentLocationName || '');
+
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [categories, setCategories] = useState<DisplayCategory[]>([DEFAULT_CATEGORY]);
 
-    // Update local state if prop changes (e.g. geolocation found)
-    useEffect(() => {
-        if (currentLocationName) setLocationText(currentLocationName);
-    }, [currentLocationName]);
+
 
     // Fetch categories
     useEffect(() => {
@@ -57,7 +54,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, c
     }, []);
 
     const handleSearchSubmit = () => {
-        onSearch(searchText === 'all' ? '' : searchText, locationText);
+        onSearch(searchText === 'all' ? '' : searchText, currentLocationName);
     };
 
     const handleCategoryClick = (catId: string, label: string) => {
@@ -66,7 +63,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, c
         // The backend search might expect a name or ID. 
         // Based on previous tasks, the search on backend checks `category.name` or `serviceTitle`.
         // So we should probably pass the category name (label) as the query if it's not 'all'.
-        onSearch(catId === 'all' ? '' : label, locationText);
+        onSearch(catId === 'all' ? '' : label, currentLocationName);
     };
 
     return (
@@ -97,24 +94,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onLocationRequest, c
                         />
                     </div>
 
-                    <div className="flex-1 relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <MapPin className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            value={locationText}
-                            onChange={(e) => setLocationText(e.target.value)}
-                            className="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow shadow-sm"
-                            placeholder="City or Zip"
-                        />
-                        <button
-                            onClick={onLocationRequest}
-                            className="absolute inset-y-0 right-2 px-3 text-xs font-medium text-gray-500 hover:text-black"
-                        >
-                            Detect
-                        </button>
-                    </div>
+
                 </div>
 
                 {/* Categories */}
