@@ -1,5 +1,6 @@
-import { Briefcase, CheckCircle, Globe, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { ArrowLeft, Briefcase, CheckCircle, Globe, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserLocation } from '../../hooks/useUserLocation';
 import { createService, type ServiceData } from '../../api/serviceApi';
 import { OtpModal } from '../Auth/OtpModal';
@@ -14,6 +15,7 @@ import { CategorySelect } from '../ui/CategorySelect';
 
 
 export const AddServiceForm = () => {
+    const navigate = useNavigate();
     // Form State
     const [formData, setFormData] = useState({
         businessName: '',
@@ -118,6 +120,15 @@ export const AddServiceForm = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-4 md:p-8">
+            <button
+                onClick={() => navigate(-1)}
+                className="mb-6 flex items-center text-gray-600 hover:text-black transition-colors"
+                type="button"
+            >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                <span className="font-medium">Back</span>
+            </button>
+
             <div className="text-center mb-10">
                 <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-3">
                     Register Your Service
