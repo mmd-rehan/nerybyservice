@@ -18,14 +18,19 @@ export interface ServiceData {
     phoneNumber: string; // Including top-level phoneNumber as required by schema
 }
 
+export type CreateServiceDto = Omit<ServiceData, 'category'> & {
+    category: string;
+};
+
+
 export interface Service extends ServiceData {
     _id: string;
-    distance?: number; 
+    distance?: number;
     createdAt: string;
     updatedAt: string;
 }
 
-export const createService = async (data: ServiceData) => {
+export const createService = async (data: CreateServiceDto) => {
     const response = await api.post('/services', data);
     return response.data;
 };

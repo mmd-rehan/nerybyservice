@@ -1,16 +1,14 @@
 import { ArrowLeft, Briefcase, CheckCircle, Globe, MapPin, MessageCircle, Phone } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createService, type CreateServiceDto } from '../../api/serviceApi';
 import { useUserLocation } from '../../hooks/useUserLocation';
-import { createService, type ServiceData } from '../../api/serviceApi';
 import { OtpModal } from '../Auth/OtpModal';
 import { Button } from '../ui/Button';
+import { CategorySelect } from '../ui/CategorySelect';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { LocationPicker } from './LocationPicker';
-import { CategorySelect } from '../ui/CategorySelect';
-
-
 
 
 
@@ -65,7 +63,7 @@ export const AddServiceForm = () => {
         try {
             console.log("Verifying with token:", token);
 
-            const payload: ServiceData = {
+            const payload: CreateServiceDto = {
                 serviceTitle: formData.businessName,
                 category: formData.category,
                 language: formData.language,
