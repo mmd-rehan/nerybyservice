@@ -36,7 +36,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg transition-all duration-300">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 ease-out">
             <div className="flex gap-4">
                 {/* Avatar */}
                 <div className="shrink-0 w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 font-bold text-lg">

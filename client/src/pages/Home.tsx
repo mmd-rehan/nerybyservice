@@ -3,6 +3,7 @@ import { useUserLocation } from '../hooks/useUserLocation';
 import { SearchHero } from '../components/Search/SearchHero';
 import { ResultsList } from '../components/Search/ResultsList';
 import { ResultsMap } from '../components/Search/ResultsMap';
+import { ShimmerCard } from '../components/Search/ShimmerCard';
 import { Button } from '../components/ui/Button';
 import { searchServices, type Service } from '../api/serviceApi';
 import { Map, List, Plus } from 'lucide-react';
@@ -24,8 +25,7 @@ export const Home = () => {
             performSearch('', autoLocation.lat, autoLocation.lng);
         } else {
             // Initial search if no location yet (or waiting for it)
-            // performSearch(''); // Optional: might want to wait slightly or just search global first
-            if (!userLocation) performSearch('');
+            // if (!userLocation) performSearch('');
         }
     }, [autoLocation]);
 
@@ -67,7 +67,7 @@ export const Home = () => {
             />
 
             <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-start animate-fadeInUp anim-delay-3">
                     <h2 className="text-xl font-bold text-gray-900">
                         {isLoading ? 'Searching...' : `${results.length} providers`}
                     </h2>
@@ -107,10 +107,17 @@ export const Home = () => {
                     </div>
                 </div>
 
-                {viewMode === 'list' ? (
+                {isLoading ? (
+                    /* Shimmer skeleton grid while loading */
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                            <ShimmerCard key={i} />
+                        ))}
+                    </div>
+                ) : viewMode === 'list' ? (
                     <ResultsList results={results} />
                 ) : (
-                    <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
+                    <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 animate-start animate-fadeIn">
                         <ResultsMap
                             services={results.map((r) => ({
                                 id: r._id,

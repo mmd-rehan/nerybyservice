@@ -17,17 +17,21 @@ export const ResultsList: FC<ResultsListProps> = ({ results }) => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            {results.map((service) => (
-                <ServiceCard
+            {results.map((service, index) => (
+                <div
                     key={service._id}
-                    id={service._id}
-                    title={service.serviceTitle}
-                    category={service.category}
-                    description={service.description}
-                    distance={service.distance}
-                    phone={service.phoneNumber || service.contactDetails?.phone} // Fallback
-                    whatsapp={service.contactDetails?.whatsapp}
-                />
+                    className={`animate-start animate-fadeInUp anim-delay-${Math.min(index + 1, 8)}`}
+                >
+                    <ServiceCard
+                        id={service._id}
+                        title={service.serviceTitle}
+                        category={service.category}
+                        description={service.description}
+                        distance={service.distance}
+                        phone={service.phoneNumber || service.contactDetails?.phone}
+                        whatsapp={service.contactDetails?.whatsapp}
+                    />
+                </div>
             ))}
         </div>
     );

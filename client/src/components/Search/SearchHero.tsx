@@ -69,7 +69,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName 
     return (
         <div className="bg-white pb-8 pt-12 px-4 border-b border-gray-100">
             <div className="max-w-5xl mx-auto text-center space-y-8">
-                <div>
+                <div className="animate-start animate-fadeInUp">
                     <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
                         Find Local Services
                     </h1>
@@ -79,7 +79,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName 
                 </div>
 
                 {/* Search Inputs Container */}
-                <div className="flex flex-col md:flex-row gap-3 max-w-2xl mx-auto p-2">
+                <div className="flex flex-col md:flex-row gap-3 max-w-2xl mx-auto p-2 animate-start animate-fadeInUp anim-delay-2">
                     <div className="flex-1 relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <Search className="h-5 w-5 text-gray-400" />
@@ -98,7 +98,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName 
                 </div>
 
                 {/* Categories */}
-                <div className="flex flex-wrap justify-center gap-3">
+                <div className="flex flex-wrap justify-center gap-3 animate-start animate-fadeIn anim-delay-4">
                     {categories.map((cat) => (
                         <button
                             key={cat.id}
