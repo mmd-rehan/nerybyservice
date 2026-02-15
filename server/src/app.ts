@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import serviceRoutes from './routes/serviceRoutes';
 import locationRoutes from './routes/locationRoutes';
 import categoryRoutes from './routes/categoryRoutes';
+import contactRoutes from './routes/contactRoutes';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(morgan('dev'));
 app.use('/api', serviceRoutes);
 app.use('/api', locationRoutes);
 app.use('/api', categoryRoutes);
+app.use('/api', contactRoutes);
 
 // Health check
 app.get('/', (req, res) => {
