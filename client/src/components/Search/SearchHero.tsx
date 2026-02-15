@@ -1,4 +1,4 @@
-import { Briefcase, Car, Grid, Hammer, Paintbrush, Search, Sparkles, Wrench, Zap } from 'lucide-react';
+import { Briefcase, Bug, Car, Cog, Grid, Hammer, Home, Key, MoreHorizontal, Paintbrush, Ruler, Search, Sparkles, Trees, Truck, Wind, Wrench, Zap } from 'lucide-react';
 
 import { useEffect, useState, type FC } from 'react';
 import { fetchCategories } from '../../api/categoryApi';
@@ -21,8 +21,17 @@ const getCategoryIcon = (name: string) => {
     if (lower.includes('plumb')) return <Wrench className="w-4 h-4" />;
     if (lower.includes('electr')) return <Zap className="w-4 h-4" />;
     if (lower.includes('clean')) return <Sparkles className="w-4 h-4" />;
-    if (lower.includes('carpent')) return <Hammer className="w-4 h-4" />;
+    if (lower.includes('landscap')) return <Trees className="w-4 h-4" />;
+    if (lower.includes('handy')) return <Hammer className="w-4 h-4" />;
+    if (lower.includes('mov')) return <Truck className="w-4 h-4" />;
     if (lower.includes('paint')) return <Paintbrush className="w-4 h-4" />;
+    if (lower.includes('hvac')) return <Wind className="w-4 h-4" />;
+    if (lower.includes('roof')) return <Home className="w-4 h-4" />;
+    if (lower.includes('pest')) return <Bug className="w-4 h-4" />;
+    if (lower.includes('applianc')) return <Cog className="w-4 h-4" />;
+    if (lower.includes('lock')) return <Key className="w-4 h-4" />;
+    if (lower.includes('carpent')) return <Ruler className="w-4 h-4" />;
+    if (lower.includes('other')) return <MoreHorizontal className="w-4 h-4" />;
     if (lower.includes('mechanic')) return <Car className="w-4 h-4" />;
     return <Briefcase className="w-4 h-4" />;
 };

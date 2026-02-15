@@ -90,7 +90,7 @@ export const Home = () => {
                 )}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-start animate-fadeInUp anim-delay-3">
                     <h2 className="text-xl font-bold text-gray-900">
-                        {isLoading ? 'Searching...' : `${results.length} providers`}
+                        {isLoading ? 'Searching...' : `${results.length} providers near you`}
                     </h2>
 
                     <div className="flex items-center gap-3">
