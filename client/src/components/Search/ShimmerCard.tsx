@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 export const ShimmerCard: FC = () => {
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 animate-fadeIn">
+        <div className="bg-gray-400 rounded-2xl border border-gray-100 p-5 animate-fadeIn">
             <div className="flex gap-4">
                 {/* Avatar skeleton */}
                 <div className="shrink-0 w-12 h-12 rounded-xl shimmer-bg animate-shimmer" />

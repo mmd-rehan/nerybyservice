@@ -28,7 +28,7 @@ export const createService = async (req: Request, res: Response) => {
 
 export const searchServices = async (req: Request, res: Response) => {
     try {
-        const { lat, lng, radius, text, query: searchQuery } = req.query;
+        const { lat, lng, radius, text, query: searchQuery, page = 1, limit = 20 } = req.query;
         const searchTerm = (text as string) || (searchQuery as string);
 
 
@@ -39,6 +39,9 @@ export const searchServices = async (req: Request, res: Response) => {
         const latitude = parseFloat(lat as string);
         const longitude = parseFloat(lng as string);
         const radiusInMeters = radius ? parseFloat(radius as string) : 160934; // Default 100 miles ~ 160934 meters
+        const pageNum = parseInt(page as string, 10) || 1;
+        const limitNum = parseInt(limit as string, 10) || 20;
+        const skip = (pageNum - 1) * limitNum;
 
 
         // Since $near sorts by distance automatically, we don't need additional sort.
@@ -88,13 +91,30 @@ export const searchServices = async (req: Request, res: Response) => {
             });
         }
 
+        // Add Facet for pagination and counting
+        pipeline.push({
+            $facet: {
+                metadata: [{ $count: "total" }],
+                data: [{ $skip: skip }, { $limit: limitNum }]
+            }
+        });
 
-        const services = await Service.aggregate(pipeline);
+
+        const result = await Service.aggregate(pipeline);
+
+        const data = result[0].data;
+        const total = result[0].metadata[0] ? result[0].metadata[0].total : 0;
+        const hasMore = skip + data.length < total;
 
         res.status(200).json({
             success: true,
-            count: services.length,
-            data: services,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                hasMore
+            },
+            data: data,
         });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });

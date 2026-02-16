@@ -4,8 +4,7 @@ import { useEffect, useState, type FC } from 'react';
 import { fetchCategories } from '../../api/categoryApi';
 
 interface SearchHeroProps {
-    onSearch: (query: string, location?: string) => void;
-    currentLocationName?: string;
+    onSearch: (query: string) => void;
 }
 
 interface DisplayCategory {
@@ -36,7 +35,7 @@ const getCategoryIcon = (name: string) => {
     return <Briefcase className="w-4 h-4" />;
 };
 
-export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName }) => {
+export const SearchHero: FC<SearchHeroProps> = ({ onSearch }) => {
     const [searchText, setSearchText] = useState('');
 
     const [selectedCategory, setSelectedCategory] = useState('all');
@@ -63,7 +62,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName 
     }, []);
 
     const handleSearchSubmit = () => {
-        onSearch(searchText === 'all' ? '' : searchText, currentLocationName);
+        onSearch(searchText === 'all' ? '' : searchText);
     };
 
     const handleCategoryClick = (catId: string, label: string) => {
@@ -72,7 +71,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, currentLocationName 
         // The backend search might expect a name or ID. 
         // Based on previous tasks, the search on backend checks `category.name` or `serviceTitle`.
         // So we should probably pass the category name (label) as the query if it's not 'all'.
-        onSearch(catId === 'all' ? '' : label, currentLocationName);
+        onSearch(catId === 'all' ? '' : label);
     };
 
     return (

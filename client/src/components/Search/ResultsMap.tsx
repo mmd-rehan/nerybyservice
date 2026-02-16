@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { type FC } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import { Button } from '../ui/Button';
 
 // Fix for default marker icon in Leaflet + React
@@ -51,9 +51,25 @@ interface ServiceLocation {
 interface ResultsMapProps {
     services: ServiceLocation[];
     userLocation?: { lat: number; lng: number };
+    onMapChange?: (center: { lat: number; lng: number }, radius: number) => void;
 }
 
-export const ResultsMap: FC<ResultsMapProps> = ({ services, userLocation }) => {
+const MapEvents: FC<{ onMapChange?: (center: { lat: number; lng: number }, radius: number) => void }> = ({ onMapChange }) => {
+    const map = useMapEvents({
+        moveend: () => {
+            if (!onMapChange) return;
+            const center = map.getCenter();
+            const bounds = map.getBounds();
+            const northEast = bounds.getNorthEast();
+            // Calculate radius in meters from center to corner
+            const radius = map.distance(center, northEast);
+            onMapChange({ lat: center.lat, lng: center.lng }, radius);
+        },
+    });
+    return null;
+};
+
+export const ResultsMap: FC<ResultsMapProps> = ({ services, userLocation, onMapChange }) => {
     // Default center if no user location (e.g. New York)
     const mapCenter = userLocation || { lat: 40.7128, lng: -74.0060 };
 
@@ -68,6 +84,8 @@ export const ResultsMap: FC<ResultsMapProps> = ({ services, userLocation }) => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                     url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                 />
+
+                <MapEvents onMapChange={onMapChange} />
 
                 {/* User Location */}
                 {userLocation && (

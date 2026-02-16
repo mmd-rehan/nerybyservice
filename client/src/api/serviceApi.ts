@@ -40,9 +40,22 @@ export interface SearchParams {
     lat?: number;
     lng?: number;
     radius?: number; // in meters
+    page?: number;
+    limit?: number;
 }
 
-export const searchServices = async (params: SearchParams) => {
+export interface ServiceResponse {
+    success: boolean;
+    data: Service[];
+    pagination?: {
+        total: number;
+        page: number;
+        limit: number;
+        hasMore: boolean;
+    };
+}
+
+export const searchServices = async (params: SearchParams): Promise<ServiceResponse> => {
     const response = await api.get('/search', { params });
     return response.data;
 };
