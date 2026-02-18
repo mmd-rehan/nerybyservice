@@ -71,7 +71,7 @@ export const AddServiceForm = () => {
                 phoneNumber: formData.phone,
                 contactDetails: {
                     phone: formData.phone,
-                    whatsapp: formData.whatsapp || formData.phone,
+                    whatsapp: formData.whatsapp || undefined,
                 },
                 location: {
                     type: 'Point',

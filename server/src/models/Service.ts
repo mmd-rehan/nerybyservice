@@ -4,7 +4,7 @@ import { z } from 'zod';
 // --- Zod Schema for Validation ---
 export const ContactDetailsSchema = z.object({
     phone: z.string(),
-    whatsapp: z.string(),
+    whatsapp: z.string().optional(),
 });
 
 export const ServiceSchemaZod = z.object({
@@ -40,7 +40,7 @@ export interface IService extends Document {
     status: 'pending' | 'approved';
     contactDetails: {
         phone: string;
-        whatsapp: string;
+        whatsapp?: string;
     };
     language: string;
 }
@@ -72,7 +72,7 @@ const ServiceSchema = new Schema<IService>(
         },
         contactDetails: {
             phone: { type: String, required: true },
-            whatsapp: { type: String, required: true },
+            whatsapp: { type: String },
         },
         language: { type: String },
     },

@@ -10,7 +10,7 @@ interface ServiceCardProps {
     description: string;
     distance?: number;
     phone: string;
-    whatsapp: string;
+    whatsapp?: string;
 }
 
 export const ServiceCard: FC<ServiceCardProps> = ({
@@ -75,17 +75,19 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                         Call
                     </Button>
                 </a>
-                <a
-                    href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                >
-                    <Button variant="outline" className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl h-10 text-sm">
-                        <MessageCircle className="w-3.5 h-3.5 mr-2" />
-                        WhatsApp
-                    </Button>
-                </a>
+                {whatsapp && (
+                    <a
+                        href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1"
+                    >
+                        <Button variant="outline" className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl h-10 text-sm">
+                            <MessageCircle className="w-3.5 h-3.5 mr-2" />
+                            WhatsApp
+                        </Button>
+                    </a>
+                )}
             </div>
         </div>
     );

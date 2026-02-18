@@ -13,7 +13,7 @@ export interface ServiceData {
     radius: number; // in meters
     contactDetails: {
         phone: string;
-        whatsapp: string;
+        whatsapp?: string;
     };
     phoneNumber: string; // Including top-level phoneNumber as required by schema
 }
