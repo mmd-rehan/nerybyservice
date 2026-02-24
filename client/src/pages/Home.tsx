@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 export const Home = () => {
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
     const [results, setResults] = useState<Service[]>([]);
+    const [totalResults, setTotalResults] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [page, setPage] = useState(1);
@@ -65,9 +66,11 @@ export const Home = () => {
 
         if (data) {
             setResults(data.data || []);
+            setTotalResults(data.pagination?.total || data.data?.length || 0);
             setHasMore(data.pagination?.hasMore ?? false);
         } else {
             setResults([]);
+            setTotalResults(0);
             setHasMore(false);
         }
         setIsLoading(false);
@@ -85,9 +88,11 @@ export const Home = () => {
 
         if (data) {
             setResults(data.data || []);
+            setTotalResults(data.pagination?.total || data.data?.length || 0);
             setHasMore(data.pagination?.hasMore ?? false);
         } else {
             setResults([]);
+            setTotalResults(0);
             setHasMore(false);
         }
         setIsLoading(false);
@@ -108,6 +113,7 @@ export const Home = () => {
                 const uniqueNewServices = newServices.filter(s => !existingIds.has(s._id));
                 return [...prev, ...uniqueNewServices];
             });
+            setTotalResults(data.pagination?.total ?? totalResults);
             setHasMore(data.pagination?.hasMore ?? false);
             setPage(nextPage);
         }
@@ -144,7 +150,7 @@ export const Home = () => {
                 )}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-start animate-fadeInUp anim-delay-3">
                     <h2 className="text-xl font-bold text-gray-900">
-                        {isLoading ? 'Searching...' : `${results.length} providers near you`}
+                        {isLoading ? 'Searching...' : `${totalResults} providers near you`}
                     </h2>
 
                     <div className="flex items-center gap-3">
