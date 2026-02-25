@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { AddServiceForm } from './components/AddService/AddServiceForm';
 import { Contact } from './pages/Contact';
+import { FAQ } from './pages/FAQ';
 import { Footer } from './components/Footer';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/add-service" element={<div className="min-h-screen bg-gray-100 py-8"><AddServiceForm /></div>} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
           </Routes>
         </div>
         <Footer />

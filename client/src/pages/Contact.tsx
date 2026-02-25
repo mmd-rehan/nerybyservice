@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 // Wait, I didn't check if react-hook-form is installed. I'll use standard controlled inputs to be safe and avoid extra deps if not needed, as per plan "Use useForm (if available) or controlled inputs".
 // I'll use controlled inputs to be safe.
 
@@ -89,9 +90,9 @@ export const Contact = () => {
                             <p className="text-amber-800 mb-4">
                                 Find quick answers to common questions about our services and platform.
                             </p>
-                            <a href="#" className="text-amber-600 font-semibold hover:text-amber-700 inline-flex items-center gap-2">
+                            <Link to="/faq" className="text-amber-600 font-semibold hover:text-amber-700 inline-flex items-center gap-2">
                                 Visit FAQ Center <Send className="w-4 h-4" />
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
