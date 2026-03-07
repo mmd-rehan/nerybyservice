@@ -189,20 +189,22 @@ export const Home = () => {
                 </div>
 
                 {viewMode === 'list' ? (
-                    isLoading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                            {[...Array(4)].map((_, i) => (
-                                <ShimmerCard key={i} />
-                            ))}
-                        </div>
-                    ) : (
-                        <ResultsList
-                            results={results}
-                            onLoadMore={loadMore}
-                            hasMore={hasMore}
-                            loading={isFetchingMore}
-                        />
-                    )
+                    <div className="h-[70vh] overflow-y-auto pr-2 pb-4 style-scrollbar">
+                        {isLoading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {[...Array(6)].map((_, i) => (
+                                    <ShimmerCard key={i} />
+                                ))}
+                            </div>
+                        ) : (
+                            <ResultsList
+                                results={results}
+                                onLoadMore={loadMore}
+                                hasMore={hasMore}
+                                loading={isFetchingMore}
+                            />
+                        )}
+                    </div>
                 ) : (
                     <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 animate-start animate-fadeIn relative">
                         {isLoading && (
