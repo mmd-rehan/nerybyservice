@@ -32,3 +32,21 @@
 .anim-delay-6 { animation-delay: 0.6s; }
 .anim-delay-7 { animation-delay: 0.7s; }
 .anim-delay-8 { animation-delay: 0.8s; }
+
+/* Report modal entrance */
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Dropdown menu fade in */
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast slide up */
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}

@@ -6,6 +6,7 @@ import serviceRoutes from './routes/serviceRoutes';
 import locationRoutes from './routes/locationRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import contactRoutes from './routes/contactRoutes';
+import reportRoutes from './routes/reportRoutes';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api', serviceRoutes);
 app.use('/api', locationRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', contactRoutes);
+app.use('/api', reportRoutes);
 
 // Health check
 app.get('/', (req, res) => {
