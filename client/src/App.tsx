@@ -4,6 +4,7 @@ import { AddServiceForm } from './components/AddService/AddServiceForm';
 import { Contact } from './pages/Contact';
 import { FAQ } from './pages/FAQ';
 import { About } from './pages/About';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Footer } from './components/Footer';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
           </Routes>
         </div>
         <Footer />
