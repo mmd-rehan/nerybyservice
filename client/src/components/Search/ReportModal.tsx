@@ -61,6 +61,12 @@ export const ReportModal: FC<ReportModalProps> = ({
         e.preventDefault();
         if (!reason) return;
 
+        const wordCount = comment.trim() ? comment.trim().split(/\s+/).length : 0;
+        if (wordCount < 3) {
+            setError('Please provide a comment with at least 3 words.');
+            return;
+        }
+
         setIsSubmitting(true);
         setError('');
 
@@ -139,7 +145,7 @@ export const ReportModal: FC<ReportModalProps> = ({
                     {/* Comment */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                            Comments <span className="text-gray-400 font-normal">(optional)</span>
+                            Comments <span className="text-red-500">*</span>
                         </label>
                         <textarea
                             value={comment}

@@ -13,7 +13,9 @@ export const ReportSchemaZod = z.object({
     serviceId: z.string().min(1, 'Service ID is required'),
     userId: z.string().optional(),
     reason: z.enum(ReportReasons, { message: 'Reason is required' }),
-    comment: z.string().optional(),
+    comment: z.string({ message: 'Comment is required' }).refine((val) => val.trim().split(/\s+/).length >= 3, {
+        message: 'Comment must be at least 3 words',
+    }),
     reportedAt: z.string().optional(),
 });
 
@@ -24,7 +26,7 @@ export interface IReport extends Document {
     serviceId: mongoose.Types.ObjectId;
     userId?: mongoose.Types.ObjectId;
     reason: string;
-    comment?: string;
+    comment: string;
     status: 'pending' | 'reviewed' | 'resolved';
 }
 
@@ -47,6 +49,7 @@ const ReportSchema = new Schema<IReport>(
         },
         comment: {
             type: String,
+            required: true,
         },
         status: {
             type: String,
