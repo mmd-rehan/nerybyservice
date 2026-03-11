@@ -5,8 +5,8 @@ import { ResultsList } from '../components/Search/ResultsList';
 import { ResultsMap } from '../components/Search/ResultsMap';
 import { ShimmerCard } from '../components/Search/ShimmerCard';
 import { Button } from '../components/ui/Button';
-import { searchServices, type Service } from '../api/serviceApi';
-import { Map, List, Plus, MapPin, RefreshCw } from 'lucide-react';
+import { searchServices, aiSearchServices, type Service } from '../api/serviceApi';
+import { Map, List, Plus, MapPin, RefreshCw, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Home = () => {
@@ -18,6 +18,7 @@ export const Home = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [searchParams, setSearchParams] = useState<{ query: string; lat?: number; lng?: number; radius?: number }>({ query: '' });
+    const [interpretedQuery, setInterpretedQuery] = useState<any>(null);
 
     const { location: autoLocation, permissionDenied, retry: retryLocation } = useUserLocation();
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>(undefined);
@@ -57,6 +58,7 @@ export const Home = () => {
         const searchLat = lat ?? userLocation?.lat;
         const searchLng = lng ?? userLocation?.lng;
 
+        setInterpretedQuery(null);
         setSearchParams({ query, lat: searchLat, lng: searchLng, radius: 50000 });
         setPage(1);
         setHasMore(true);
@@ -72,6 +74,39 @@ export const Home = () => {
             setResults([]);
             setTotalResults(0);
             setHasMore(false);
+        }
+        setIsLoading(false);
+    };
+
+    const handleAiSearchSubmit = async (query: string) => {
+        const searchLat = userLocation?.lat;
+        const searchLng = userLocation?.lng;
+
+        if (!searchLat || !searchLng) {
+            alert("Please enable location access to use AI search.");
+            return;
+        }
+
+        setInterpretedQuery(null);
+        setSearchParams({ query, lat: searchLat, lng: searchLng, radius: 5000 });
+        setPage(1);
+        setHasMore(false);
+        setIsLoading(true);
+
+        try {
+            const data = await aiSearchServices(query, { lat: searchLat, lng: searchLng });
+            if (data && data.success) {
+                setResults(data.results || []);
+                setTotalResults(data.results?.length || 0);
+                setInterpretedQuery(data.interpretedQuery);
+            } else {
+                setResults([]);
+                setTotalResults(0);
+            }
+        } catch (error) {
+            console.error("AI Search failed:", error);
+            setResults([]);
+            setTotalResults(0);
         }
         setIsLoading(false);
     };
@@ -124,6 +159,7 @@ export const Home = () => {
         <div className="min-h-screen bg-gray-50 pb-20 font-sans">
             <SearchHero
                 onSearch={handleSearch}
+                onAiSearch={handleAiSearchSubmit}
             />
 
             <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8">
@@ -149,9 +185,23 @@ export const Home = () => {
                     </div>
                 )}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-start animate-fadeInUp anim-delay-3">
-                    <h2 className="text-xl font-bold text-gray-900">
-                        {isLoading ? 'Searching...' : `${totalResults} providers near you`}
-                    </h2>
+                    <div className="flex flex-col gap-2">
+                        {interpretedQuery && (
+                            <div className="p-3 bg-amber-50 text-amber-900 rounded-xl border border-amber-200">
+                                <p className="font-semibold text-sm">
+                                    <Sparkles className="w-4 h-4 inline-block mr-1 text-amber-500" />
+                                    AI Understood: <span className="font-normal text-amber-800">
+                                        Looking for <strong className="font-semibold">{interpretedQuery.service || 'services'}</strong> 
+                                        {interpretedQuery.category ? ` in ${interpretedQuery.category}` : ''} 
+                                        {interpretedQuery.keywords && interpretedQuery.keywords.length > 0 ? ` related to "${interpretedQuery.keywords.join(', ')}"` : ''}
+                                    </span>
+                                </p>
+                            </div>
+                        )}
+                        <h2 className="text-xl font-bold text-gray-900">
+                            {isLoading ? 'Searching...' : `${totalResults} providers near you`}
+                        </h2>
+                    </div>
 
                     <div className="flex items-center gap-3">
                         {/* View Toggle */}

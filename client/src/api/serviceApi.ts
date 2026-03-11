@@ -59,3 +59,14 @@ export const searchServices = async (params: SearchParams): Promise<ServiceRespo
     const response = await api.get('/search', { params });
     return response.data;
 };
+
+export interface AiSearchResponse {
+    success: boolean;
+    interpretedQuery: any;
+    results: Service[];
+}
+
+export const aiSearchServices = async (query: string, userLocation: { lat: number, lng: number }): Promise<AiSearchResponse> => {
+    const response = await api.post('/ai/search', { query, userLocation });
+    return response.data;
+};

@@ -5,6 +5,7 @@ import { fetchCategories } from '../../api/categoryApi';
 
 interface SearchHeroProps {
     onSearch: (query: string) => void;
+    onAiSearch?: (query: string) => void;
 }
 
 interface DisplayCategory {
@@ -35,8 +36,9 @@ const getCategoryIcon = (name: string) => {
     return <Briefcase className="w-4 h-4" />;
 };
 
-export const SearchHero: FC<SearchHeroProps> = ({ onSearch }) => {
+export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
     const [searchText, setSearchText] = useState('');
+    const [aiSearchText, setAiSearchText] = useState('');
 
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [categories, setCategories] = useState<DisplayCategory[]>([DEFAULT_CATEGORY]);
@@ -65,6 +67,12 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch }) => {
         onSearch(searchText === 'all' ? '' : searchText);
     };
 
+    const handleAiSearchSubmit = () => {
+        if (onAiSearch && aiSearchText.trim()) {
+            onAiSearch(aiSearchText.trim());
+        }
+    };
+
     const handleCategoryClick = (catId: string, label: string) => {
         setSelectedCategory(catId);
         // If "All" is selected, clear search. Otherwise use the ID or Name.
@@ -87,8 +95,36 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch }) => {
                 </div>
 
                 {/* Search Inputs Container */}
-                <div className="flex flex-col md:flex-row gap-3 max-w-2xl mx-auto p-2 animate-start animate-fadeInUp anim-delay-2">
-                    <div className="flex-1 relative">
+                <div className="flex flex-col gap-4 max-w-2xl mx-auto p-2 animate-start animate-fadeInUp anim-delay-2">
+                    {/* Natural Language AI Search */}
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Sparkles className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <input
+                            type="text"
+                            value={aiSearchText}
+                            onChange={(e) => setAiSearchText(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleAiSearchSubmit()}
+                            className="block w-full pl-11 pr-24 py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium"
+                            placeholder="Describe the help you need... e.g. Find a plumber near me"
+                        />
+                        <button
+                            onClick={handleAiSearchSubmit}
+                            className="absolute right-2 top-2 bottom-2 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm text-sm"
+                        >
+                            AI Search
+                        </button>
+                    </div>
+
+                    <div className="flex items-center gap-4 py-2">
+                        <div className="flex-1 h-px bg-gray-200"></div>
+                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">OR STANDARD SEARCH</span>
+                        <div className="flex-1 h-px bg-gray-200"></div>
+                    </div>
+
+                    {/* Standard Search */}
+                    <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <Search className="h-5 w-5 text-gray-400" />
                         </div>
@@ -97,12 +133,10 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch }) => {
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
-                            className="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow shadow-sm"
-                            placeholder="What do you need help with?"
+                            className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow text-sm"
+                            placeholder="Search by keywords..."
                         />
                     </div>
-
-
                 </div>
 
                 {/* Categories */}
