@@ -1,5 +1,4 @@
-import { InputHTMLAttributes, forwardRef, ReactNode } from 'react';
-import { clsx } from 'clsx';
+import { type InputHTMLAttributes, forwardRef, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
