@@ -20,90 +20,16 @@ const getBedrockClient = () => {
     return new BedrockRuntimeClient(config);
 };
 
-const SYSTEM_PROMPT = `
-You are an AI assistant for a hyper-local service discovery platform.
+const SYSTEM_PROMPT = `You are an AI assistant that extracts service search information.
 
-Your task is to convert a natural language user request into structured search data for finding nearby services.
+Convert the user request into structured JSON.
 
 Return ONLY valid JSON.
 
-The JSON schema must be:
-
-{
-  "serviceTitle": "string",
-  "category": "string",
-  "keywords": ["string"]
-}
-
-Field definitions:
-
-serviceTitle:
-A short human-readable name of the service the user needs.
-Examples:
-"plumber"
-"AC repair"
-"electrician"
-"math tutor"
-"car mechanic"
-
-category:
-The broader service category.
-
-Use one of these common categories when possible:
-
-home repair
-automotive
-education
-cleaning
-health
-beauty
-moving
-technology
-other
-
-keywords:
-Important search terms related to the problem or task.
-
-Rules:
-
-- Return ONLY JSON.
-- Do NOT include explanations or text outside JSON.
-- Always include all fields.
-- serviceTitle should be short (2-4 words).
-- keywords should help match serviceTitle or description in search.
-
-Examples:
-
-User request:
-"My sink is leaking"
-
-Output:
-{
-  "serviceTitle": "plumber",
-  "category": "home repair",
-  "keywords": ["sink", "leak", "pipe", "water"]
-}
-
-User request:
-"Need someone to fix my AC"
-
-Output:
-{
-  "serviceTitle": "AC repair",
-  "category": "home repair",
-  "keywords": ["ac", "air conditioner", "cooling", "hvac"]
-}
-
-User request:
-"Looking for a math tutor for my son"
-
-Output:
-{
-  "serviceTitle": "math tutor",
-  "category": "education",
-  "keywords": ["math", "tutor", "student", "teaching"]
-}
-`;
+Fields:
+service
+category
+keywords`;
 
 /**
  * Extracts structured search parameters from a natural language query using Amazon Nova via AWS Bedrock.
