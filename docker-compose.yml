@@ -21,7 +21,9 @@ services:
     env_file:
       - ./server/.env
     environment:
-      - MONGO_URI=mongodb://mongo:27017/nerybyservice
+      - MONGO_URI=${MONGO_URI}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
       - REDIS_URL=redis://redis:6379
     networks:
       - frontend
@@ -30,12 +32,12 @@ services:
       - mongo
       - redis
 
-  mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    networks:
-      - backend
+  # mongo:
+  #   image: mongo:latest
+  #   ports:
+  #     - "27017:27017"
+  #   networks:
+  #     - backend
     # No ports exposed to host
 
   redis:
