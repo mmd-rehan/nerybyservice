@@ -28,8 +28,7 @@ services:
     networks:
       - frontend
       - backend
-    depends_on:
-      - mongo
+    depends_on:      
       - redis
 
   # mongo:
