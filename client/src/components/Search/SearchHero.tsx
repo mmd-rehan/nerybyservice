@@ -1,11 +1,11 @@
-import { Briefcase, Bug, Car, Cog, Grid, Hammer, Home, Key, MoreHorizontal, Paintbrush, Ruler, Search, Sparkles, Trees, Truck, Wind, Wrench, Zap } from 'lucide-react';
+import { Briefcase, Bug, Car, Cog, Grid, Hammer, Home, Key, MoreHorizontal, Paintbrush, Ruler, Search, Sparkles, Trees, Truck, Wind, Wrench, Zap, Mic, Paperclip, X, Square } from 'lucide-react';
 
-import { useEffect, useState, type FC } from 'react';
+import { useEffect, useState, useRef, type FC } from 'react';
 import { fetchCategories } from '../../api/categoryApi';
 
 interface SearchHeroProps {
     onSearch: (query: string) => void;
-    onAiSearch?: (query: string) => void;
+    onAiSearch?: (query: string, audio: Blob | null, image: File | null) => void;
 }
 
 interface DisplayCategory {
@@ -40,6 +40,14 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
     const [searchText, setSearchText] = useState('');
     const [aiSearchText, setAiSearchText] = useState('');
 
+    const [isRecording, setIsRecording] = useState(false);
+    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [categories, setCategories] = useState<DisplayCategory[]>([DEFAULT_CATEGORY]);
 
@@ -68,9 +76,56 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
     };
 
     const handleAiSearchSubmit = () => {
-        if (onAiSearch && aiSearchText.trim()) {
-            onAiSearch(aiSearchText.trim());
+        if (onAiSearch && (aiSearchText.trim() || audioBlob || imageFile)) {
+            onAiSearch(aiSearchText.trim(), audioBlob, imageFile);
+            setAiSearchText('');
+            setAudioBlob(null);
+            setImageFile(null);
         }
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                setAudioBlob(audioBlob);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (error) {
+            console.error("Error accessing microphone:", error);
+            alert("Could not access the microphone.");
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setImageFile(e.target.files[0]);
+        }
+    };
+
+    const clearAudio = () => setAudioBlob(null);
+    const clearImage = () => {
+        setImageFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const handleCategoryClick = (catId: string, label: string) => {
@@ -106,15 +161,65 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
                             value={aiSearchText}
                             onChange={(e) => setAiSearchText(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleAiSearchSubmit()}
-                            className="block w-full pl-11 pr-24 py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium"
+                            className="block w-full pl-11 pr-[180px] py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium"
                             placeholder="Describe the help you need... e.g. My sink is leaking"
                         />
-                        <button
-                            onClick={handleAiSearchSubmit}
-                            className="absolute right-2 top-2 bottom-2 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm text-sm"
-                        >
-                            AI Search
-                        </button>
+                        
+                        <div className="absolute right-2 top-2 bottom-2 flex items-center gap-1">
+                            {/* Hidden File Input */}
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                ref={fileInputRef} 
+                                onChange={handleImageChange}
+                            />
+                            
+                            {/* Paperclip Button */}
+                            {!imageFile ? (
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="p-2 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
+                                    title="Attach an image"
+                                >
+                                    <Paperclip className="w-5 h-5" />
+                                </button>
+                            ) : (
+                                <div className="flex items-center bg-amber-100 rounded-lg px-2 py-1 gap-1 border border-amber-200">
+                                    <span className="text-xs text-amber-800 truncate w-12">{imageFile.name}</span>
+                                    <button onClick={clearImage} className="text-amber-600 hover:text-amber-800">
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Mic Button */}
+                            {!audioBlob ? (
+                                <button
+                                    onClick={isRecording ? stopRecording : startRecording}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        isRecording ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'
+                                    }`}
+                                    title={isRecording ? "Stop recording" : "Record voice"}
+                                >
+                                    {isRecording ? <Square className="w-5 h-5 fill-current" /> : <Mic className="w-5 h-5" />}
+                                </button>
+                            ) : (
+                                <div className="flex items-center bg-amber-100 rounded-lg px-2 py-1 gap-1 border border-amber-200">
+                                    <span className="text-xs text-amber-800">Audio</span>
+                                    <button onClick={clearAudio} className="text-amber-600 hover:text-amber-800">
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handleAiSearchSubmit}
+                                className="px-4 py-2 h-full bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors shadow-sm text-sm ml-1"
+                            >
+                                Search
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4 py-2">

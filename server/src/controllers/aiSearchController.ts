@@ -1,24 +1,67 @@
 import { Request, Response } from 'express';
-import { extractSearchParameters } from '../services/novaAI';
+import { extractSearchParameters } from '../services/novaTextService';
+import { analyzeImage } from '../services/novaImageService';
+import { transcribeAudio } from '../services/novaVoiceService';
 import Service from '../models/Service';
 import Category from '../models/Category';
 
 export const handleAiSearch = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { query, userLocation } = req.body;
+        let { query, userLocation } = req.body;
 
-        if (!query || !userLocation || !userLocation.lat || !userLocation.lng) {
-            res.status(400).json({ success: false, message: 'query and userLocation (lat, lng) are required' });
+        // In multipart/form-data, objects are often sent as strings
+        if (typeof userLocation === 'string') {
+            try {
+                userLocation = JSON.parse(userLocation);
+            } catch (e) {
+                console.error("Failed to parse userLocation string");
+            }
+        }
+
+        if (!userLocation || !userLocation.lat || !userLocation.lng) {
+            res.status(400).json({ success: false, message: 'userLocation (lat, lng) is required' });
+            return;
+        }
+
+        const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+        let finalQueryText = query || "";
+
+        try {
+            if (files?.image && files.image[0]) {
+                const imageFile = files.image[0];
+                console.log(`Processing image upload (${imageFile.mimetype})`);
+                finalQueryText = await analyzeImage(imageFile.buffer, imageFile.mimetype);
+            } else if (files?.audio && files.audio[0]) {
+                const audioFile = files.audio[0];
+                console.log(`Processing audio upload (${audioFile.mimetype})`);
+                finalQueryText = await transcribeAudio(audioFile.buffer, audioFile.mimetype);
+            }
+        } catch (error) {
+            console.error("Multimodal AI Extraction Failed:", error);
+            // Fallback: use query if provided, else return error
+            if (!finalQueryText) {
+                res.status(500).json({ success: false, message: 'Failed to process audio/image and no text query provided.' });
+                return;
+            }
+        }
+
+        if (!finalQueryText) {
+            res.status(400).json({ success: false, message: 'Missing text query, audio, or image input.' });
             return;
         }
 
         let interpretedQuery: any = {};
         
         try {
-            interpretedQuery = await extractSearchParameters(query);
+            interpretedQuery = await extractSearchParameters(finalQueryText);
         } catch (error) {
-            console.error('Nova AI Extraction Failed, falling back to basic search:', error);
-            interpretedQuery = { keywords: query.split(' ') };
+            console.error('Nova Text AI Extraction Failed, falling back to basic search:', error);
+            interpretedQuery = { keywords: finalQueryText.split(' ') };
+        }
+
+        // Add original text if it was derived from multimodal
+        if (files?.image?.[0] || files?.audio?.[0]) {
+            interpretedQuery.originalExtractedText = finalQueryText;
         }
 
         const { lat, lng } = userLocation;

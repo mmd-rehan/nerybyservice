@@ -5,9 +5,6 @@ const API_URL = 'https://api.nerybyservice.com/api';
 // Create a centralized Axios instance
 const api = axios.create({
     baseURL: API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
 });
 
 // Add a response interceptor for global error handling (optional but recommended)

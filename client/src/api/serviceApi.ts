@@ -66,7 +66,7 @@ export interface AiSearchResponse {
     results: Service[];
 }
 
-export const aiSearchServices = async (query: string, userLocation: { lat: number, lng: number }): Promise<AiSearchResponse> => {
-    const response = await api.post('/ai/search', { query, userLocation });
+export const aiSearchServices = async (formData: FormData): Promise<AiSearchResponse> => {
+    const response = await api.post('/ai/search', formData);
     return response.data;
 };

@@ -78,7 +78,7 @@ export const Home = () => {
         setIsLoading(false);
     };
 
-    const handleAiSearchSubmit = async (query: string) => {
+    const handleAiSearchSubmit = async (query: string, audioBlob?: Blob | null, imageFile?: File | null) => {
         const searchLat = userLocation?.lat;
         const searchLng = userLocation?.lng;
 
@@ -94,7 +94,17 @@ export const Home = () => {
         setIsLoading(true);
 
         try {
-            const data = await aiSearchServices(query, { lat: searchLat, lng: searchLng });
+            const formData = new FormData();
+            formData.append('query', query);
+            formData.append('userLocation', JSON.stringify({ lat: searchLat, lng: searchLng }));
+            if (audioBlob) {
+                formData.append('audio', audioBlob, 'voice.webm');
+            }
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            const data = await aiSearchServices(formData);
             if (data && data.success) {
                 setResults(data.results || []);
                 setTotalResults(data.results?.length || 0);
@@ -191,7 +201,8 @@ export const Home = () => {
                                 <p className="font-semibold text-sm">
                                     <Sparkles className="w-4 h-4 inline-block mr-1 text-amber-500" />
                                     AI Understood: <span className="font-normal text-amber-800">
-                                        Looking for <strong className="font-semibold">{interpretedQuery.service || 'services'}</strong> 
+                                        {interpretedQuery.originalExtractedText ? `"${interpretedQuery.originalExtractedText}" -> Finding ` : 'Looking for '}
+                                        <strong className="font-semibold">{interpretedQuery.service || 'services'}</strong> 
                                         {interpretedQuery.category ? ` in ${interpretedQuery.category}` : ''} 
                                         {interpretedQuery.keywords && interpretedQuery.keywords.length > 0 ? ` related to "${interpretedQuery.keywords.join(', ')}"` : ''}
                                     </span>
