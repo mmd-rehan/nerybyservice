@@ -18,12 +18,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3030:3030"
-    env_file:
-      - ./server/.env
     environment:
+      - PORT=3030
       - MONGO_URI=${MONGO_URI}
       - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID}
+      - IP_LOCATE_KEY=${IP_LOCATE_KEY}
       - REDIS_URL=redis://redis:6379
     networks:
       - frontend
