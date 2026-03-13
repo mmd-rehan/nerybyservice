@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: [self-hosted, oracle, docker]
+    runs-on: [self-hosted, oracle, docker, Linux, ARM64, production]
     environment: production
 
     steps:
