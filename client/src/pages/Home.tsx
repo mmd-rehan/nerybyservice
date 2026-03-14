@@ -78,7 +78,7 @@ export const Home = () => {
         setIsLoading(false);
     };
 
-    const handleAiSearchSubmit = async (query: string, audioBlob?: Blob | null, imageFile?: File | null) => {
+    const handleAiSearchSubmit = async (query: string, audioBlob?: Blob | null, imageFile?: File | null, videoFile?: File | null) => {
         const searchLat = userLocation?.lat;
         const searchLng = userLocation?.lng;
 
@@ -102,6 +102,9 @@ export const Home = () => {
             }
             if (imageFile) {
                 formData.append('image', imageFile);
+            }
+            if (videoFile) {
+                formData.append('video', videoFile);
             }
 
             const data = await aiSearchServices(formData);

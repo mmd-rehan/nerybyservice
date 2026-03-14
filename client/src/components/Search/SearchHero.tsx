@@ -1,11 +1,11 @@
-import { Briefcase, Bug, Car, Cog, Grid, Hammer, Home, Key, MoreHorizontal, Paintbrush, Ruler, Search, Sparkles, Trees, Truck, Wind, Wrench, Zap, Mic, Paperclip, X, Square } from 'lucide-react';
+import { Briefcase, Bug, Car, Cog, Grid, Hammer, Home, Key, MoreHorizontal, Paintbrush, Ruler, Search, Sparkles, Trees, Truck, Wind, Wrench, Zap, Mic, Paperclip, X, Square, Video } from 'lucide-react';
 
 import { useEffect, useState, useRef, type FC } from 'react';
 import { fetchCategories } from '../../api/categoryApi';
 
 interface SearchHeroProps {
     onSearch: (query: string) => void;
-    onAiSearch?: (query: string, audio: Blob | null, image: File | null) => void;
+    onAiSearch?: (query: string, audio: Blob | null, image: File | null, video: File | null) => void;
 }
 
 interface DisplayCategory {
@@ -43,6 +43,13 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
     const [isRecording, setIsRecording] = useState(false);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [videoFile, setVideoFile] = useState<File | null>(null);
+
+    const [isRecordingVideo, setIsRecordingVideo] = useState(false);
+    const videoPreviewRef = useRef<HTMLVideoElement>(null);
+    const videoStreamRef = useRef<MediaStream | null>(null);
+    const videoRecorderRef = useRef<MediaRecorder | null>(null);
+    const videoChunksRef = useRef<Blob[]>([]);
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
@@ -76,11 +83,12 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
     };
 
     const handleAiSearchSubmit = () => {
-        if (onAiSearch && (aiSearchText.trim() || audioBlob || imageFile)) {
-            onAiSearch(aiSearchText.trim(), audioBlob, imageFile);
+        if (onAiSearch && (aiSearchText.trim() || audioBlob || imageFile || videoFile)) {
+            onAiSearch(aiSearchText.trim(), audioBlob, imageFile, videoFile);
             setAiSearchText('');
             setAudioBlob(null);
             setImageFile(null);
+            setVideoFile(null);
         }
     };
 
@@ -116,15 +124,85 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const startVideoRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            videoStreamRef.current = stream;
+            
+            setIsRecordingVideo(true);
+            
+            setTimeout(() => {
+                if (videoPreviewRef.current) {
+                    videoPreviewRef.current.srcObject = stream;
+                }
+            }, 100);
+
+            const options = MediaRecorder.isTypeSupported('video/webm; codecs=vp9') ? { mimeType: 'video/webm; codecs=vp9' } : 
+                            MediaRecorder.isTypeSupported('video/webm') ? { mimeType: 'video/webm' } : 
+                            MediaRecorder.isTypeSupported('video/mp4') ? { mimeType: 'video/mp4' } : undefined;
+
+            const mediaRecorder = new MediaRecorder(stream, options);
+            videoRecorderRef.current = mediaRecorder;
+            videoChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) videoChunksRef.current.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const mimeType = videoRecorderRef.current?.mimeType || 'video/webm';
+                const blob = new Blob(videoChunksRef.current, { type: mimeType });
+                const file = new File([blob], 'video_recording.webm', { type: mimeType });
+                setVideoFile(file);
+                
+                if (videoStreamRef.current) {
+                    videoStreamRef.current.getTracks().forEach(track => track.stop());
+                }
+                setIsRecordingVideo(false);
+            };
+
+            mediaRecorder.start();
+
+            // Auto stop after 10 seconds
+            setTimeout(() => {
+                if (videoRecorderRef.current && videoRecorderRef.current.state === 'recording') {
+                    videoRecorderRef.current.stop();
+                }
+            }, 10000);
+
+        } catch (error) {
+            console.error("Error accessing camera:", error);
+            alert("Could not access the camera. Please check permissions.");
+            setIsRecordingVideo(false);
+        }
+    };
+
+    const stopVideoRecording = () => {
+        if (videoRecorderRef.current && videoRecorderRef.current.state === 'recording') {
+            videoRecorderRef.current.stop();
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setImageFile(e.target.files[0]);
+            const file = e.target.files[0];
+            if (file.type.startsWith('video/')) {
+                setVideoFile(file);
+                setImageFile(null); // Clear image if video is selected
+            } else if (file.type.startsWith('image/')) {
+                setImageFile(file);
+                setVideoFile(null); // Clear video if image is selected
+            }
         }
     };
 
     const clearAudio = () => setAudioBlob(null);
     const clearImage = () => {
         setImageFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    const clearVideo = () => {
+        setVideoFile(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
@@ -161,7 +239,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
                             value={aiSearchText}
                             onChange={(e) => setAiSearchText(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleAiSearchSubmit()}
-                            className="block w-full pl-11 pr-[180px] py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium"
+                            className="block w-full pl-11 pr-[210px] py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium"
                             placeholder="Describe the help you need... e.g. My sink is leaking"
                         />
                         
@@ -169,25 +247,50 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
                             {/* Hidden File Input */}
                             <input 
                                 type="file" 
-                                accept="image/*" 
+                                accept="image/*,video/*" 
                                 className="hidden" 
                                 ref={fileInputRef} 
-                                onChange={handleImageChange}
+                                onChange={handleFileChange}
                             />
                             
                             {/* Paperclip Button */}
-                            {!imageFile ? (
+                            {(!imageFile && !videoFile) ? (
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
                                     className="p-2 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
-                                    title="Attach an image"
+                                    title="Attach an image/video"
                                 >
                                     <Paperclip className="w-5 h-5" />
                                 </button>
-                            ) : (
+                            ) : imageFile ? (
                                 <div className="flex items-center bg-amber-100 rounded-lg px-2 py-1 gap-1 border border-amber-200">
                                     <span className="text-xs text-amber-800 truncate w-12">{imageFile.name}</span>
                                     <button onClick={clearImage} className="text-amber-600 hover:text-amber-800">
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ) : null}
+
+                            {/* Video Recording Button */}
+                            {(!imageFile && !videoFile && !audioBlob) && (
+                                <button
+                                    onClick={isRecordingVideo ? stopVideoRecording : startVideoRecording}
+                                    className={`p-2 rounded-lg transition-colors ${
+                                        isRecordingVideo ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-400 hover:text-amber-500 hover:bg-amber-50'
+                                    }`}
+                                    title={isRecordingVideo ? "Stop video recording" : "Record video (10s max)"}
+                                    disabled={isRecording}
+                                >
+                                    {isRecordingVideo ? <Square className="w-5 h-5 fill-current" /> : <Video className="w-5 h-5" />}
+                                </button>
+                            )}
+
+                            {/* Video Badge UI */}
+                            {videoFile && (
+                                <div className="flex items-center bg-amber-100 rounded-lg px-2 py-1 gap-1 border border-amber-200">
+                                    <Video className="w-3 h-3 text-amber-800" />
+                                    <span className="text-xs text-amber-800 truncate w-12">{videoFile.name}</span>
+                                    <button onClick={clearVideo} className="text-amber-600 hover:text-amber-800">
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -220,6 +323,16 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
                                 Search
                             </button>
                         </div>
+
+                        {/* Video Preview */}
+                        {isRecordingVideo && (
+                            <div className="absolute top-[110%] right-0 z-50 w-64 bg-black rounded-xl overflow-hidden shadow-2xl border-2 border-red-500">
+                               <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full aspect-video object-cover" />
+                               <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                                   REC 10s
+                               </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-4 py-2">

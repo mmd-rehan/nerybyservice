@@ -1,72 +1,317 @@
-# NeryByService
+# NeryByService: AI-Powered Hyper-Local Help
 
 A minimal local service discovery platform connecting users with local service providers.
+**“Don’t search for services. Show or describe your problem and let AI find the right help nearby.”**
 
-## Project Phases
+---
 
-### PHASE 1: Project Setup & Core Backend API
+# The Problem
 
-**Context:** Building a minimal local service discovery platform.
-**Stack:** Node.js (TypeScript), Express, MongoDB (Mongoose).
+Finding reliable local help is still surprisingly frustrating.
 
-**Key Requirements:**
-- **Database:** MongoDB with `2dsphere` index for location-based queries.
-- **Schema:** `Service` model includes `phoneNumber`, `serviceTitle`, `category`, `location` (GeoJSON), `radius`, `description`, `status` ('pending'/'approved'), `contactDetails`, `language`.
-- **API Endpoints:**
-    - `POST /api/services`: Create listing.
-    - `GET /api/search`: Spatial search ($near/$geoWithin) with filters (text, radius).
-- **Validation:** Zod/class-validator.
+When something breaks in real life, people rarely know **which service category to search for**. A leaking pipe, a strange noise in the car engine, or a malfunctioning appliance often requires guessing the right keywords or browsing through dozens of irrelevant listings.
 
-### PHASE 2: Frontend Setup & Provider Registration
+Traditional directories make the process even harder. They show businesses far away, outdated listings, or require users to fill long request forms and wait hours for responses.
 
-**Context:** React (TypeScript) frontend connected to the Phase 1 backend.
+But when real problems happen, people need something much simpler:
 
-**Key Requirements:**
-- **Stack:** Vite + React + TypeScript + Tailwind CSS.
-- **Maps:** Leaflet & React-Leaflet integration.
-- **Add Service Page:**
-    - Form inputs: Business Name, Category, Language, Description, Phone, WhatsApp.
-    - Location Picker: Draggable pin on Leaflet map + Radius slider.
-    - Submission: `POST /api/services`.
-    - Mock OTP Modal for verification.
+**Show the problem Get help nearby Contact instantly.**
 
-### PHASE 3: Search UI & Results Display
+---
 
-**Context:** User-facing search and results page.
+# The Solution: NeryByService
 
-**Key Requirements:**
-- **Hero Section:** "Find Local Services" with search input (debounced).
-- **Location:** Browser Geolocation API to center search.
-- **Results View:**
-    - **List View:** Service cards (Title, Category, Distance, Call/WhatsApp buttons). *No rating stars.*
-    - **Map View:** Pins for results, Popups with "Call" button. User location shown as a distinct dot.
-- **Category Chips:** Quick filters for "Plumbing", "Electrician", etc.
+NeryByService is an **AI-powered hyper-local service discovery platform** that connects users with nearby service providers in real time.
 
-🚀 NeryByService: The Hyper-Local Real-Time Connection Engine
-"Don't just search for help. Find it right around the corner."
+Instead of manually searching through categories, users can simply:
 
-🛑 The Problem
-In a world of information overload, finding reliable local help is surprisingly difficult. Traditional directories are cluttered with outdated listings, irrelevant ads, and service providers located miles away. When you have a leaking pipe, a dead car battery, or need a last-minute tutor, you don't need a list of businesses—you need proximity, speed, and direct contact.
+• Type a request
+• Speak to the app
+• Upload a photo
+• Record a short video
 
-✅ The Solution: NeryByService
-NeryByService is a next-generation local discovery platform built with a "Location-First" philosophy. It cuts through the noise to connect users with the nearest available service providers in real-time.
+AI analyzes the input, understands the problem, and instantly finds the most relevant service providers nearby.
 
-🌟 Key Features that Win Users
-📍 Precision Geo-Location: Unlike generic directories, we use advanced geospatial querying (MongoDB 2dsphere + Leaflet Maps) to show services within a specific radius of the user. "Show me plumbers within 1km"—pros looking to work now, right where you are.
-⚡ Zero-Friction Connectivity: We’ve removed the "middleman." No filling out long quote forms that go into a black hole. Users can connect instantly via Direct Call or WhatsApp with a single tap.
-🔍 Visual Discovery: An interactive, map-based interface allows users to physically see where help is coming from, building trust and verifying proximity instantly.
-🛠️ Dynamic Categories: From "Home Repair" to "Tutoring," our dynamic categorization engine scales with the market's needs, ensuring users find exactly what they're looking for.
-💼 For Platform Owners (The Business Case)
-This isn't just a utility; it's a monetization-ready SaaS platform.
+By combining **multimodal AI understanding with precise geolocation**, NeryByService turns real-world problems into actionable service matches within seconds.
 
-💰 Built-in Revenue Streams: Includes a robust subscription system integrated with PayPal. Service providers can subscribe to premium plans for better visibility.
-🏷️ Smart Marketing Tools: A fully functional Coupon & Discount System allows you to run promotions to attract new providers and retain existing ones.
-🛡️ Complete Admin Control: A dedicated Admin Dashboard lets you manage users, approve listings (pending vs. approved workflows), and oversee subscription plans effortlessly.
-🏗️ Technical Excellence (Under the Hood)
-Built for speed, scale, and reliability:
+---
 
-Modern Stack: React (Vite) Frontend + Node.js/Express Backend + MongoDB.
-Type-Safe: Written entirely in TypeScript for robust, bug-free code.
-Performance: Optimized with Redis caching strategies and shimmer UI loading states for a premium, fast user experience.
-🎯 The Bottom Line
-NeryByService bridges the gap between digital search and physical reality. It empowers local service providers to be seen by their literal neighbors and gives users the power of immediate, local help. It is the modern town square for the gig economy.
+# Core Capabilities
+
+### AI Problem Understanding
+
+Users can describe their issue naturally, and AI converts it into a structured service search.
+
+Example:
+
+User input
+*"My AC is not cooling."*
+
+AI interprets
+**Service:** AC Repair
+**Category:** Home Repair
+
+Nearby technicians are instantly displayed.
+
+---
+
+### 🎤 Voice-Based Search
+
+Users can simply **speak their problem**, and AI transcribes and interprets the request to find nearby services.
+
+This makes the platform accessible even when typing is inconvenient or impossible.
+
+---
+
+###  Image-Based Problem Detection
+
+Users can upload a photo of the issue.
+
+Example:
+A photo of a leaking pipe.
+
+AI detects the problem and automatically searches for **plumbers nearby**.
+
+---
+
+###  Video-Based Service Discovery
+
+For more complex issues, users can upload a short video.
+
+The system analyzes visual frames and audio to determine the problem and recommend the appropriate service providers.
+
+---
+
+###  Hyper-Local Precision
+
+Using MongoDB geospatial indexing and interactive maps, NeryByService displays services within a specific radius of the user.
+
+Instead of generic results, users see **real providers close to them right now**.
+
+---
+
+### ⚡ Instant Connection
+
+Once a service is found, users can connect immediately via:
+
+• Direct phone call
+• WhatsApp messaging
+
+No quote forms. No waiting.
+
+---
+
+#  Built for a New Generation of Local Marketplaces
+
+NeryByService is not only a consumer tool but also a **scalable marketplace platform** for local services.
+
+Service providers gain visibility to customers in their immediate area, helping them receive jobs faster without expensive advertising.
+
+Platform operators can monetize through:
+
+• provider subscriptions
+• premium listings
+• promotional campaigns
+• coupon and discount systems
+
+---
+
+#  Technical Architecture
+
+The platform is built with a modern, scalable architecture designed for real-time discovery and AI integration.
+
+Frontend
+React (Vite) with Leaflet interactive maps
+
+Backend
+Node.js + Express
+
+Database
+MongoDB with 2dsphere geospatial indexing
+
+AI Layer
+Amazon Nova foundation models enabling natural language reasoning, voice processing, and multimodal understanding.
+
+---
+
+# How the AI System Works
+
+NeryByService uses a **multimodal AI pipeline** that allows users to search for local services using **text, voice, images, or video**. The system converts these different types of inputs into a structured search query, which is then used to find the most relevant nearby service providers.
+
+The core idea is simple:
+
+**Understand the user's problem → Convert it into a service request → Find the nearest providers.**
+
+---
+
+# Multimodal Input Processing Pipeline
+
+The platform accepts four types of inputs:
+
+• Text
+• Voice recording
+• Image upload
+• Video upload
+
+Regardless of the input type, the system converts everything into **text describing the problem**, which is then interpreted by AI.
+
+---
+
+# 1. Text Input Processing
+
+When a user types a request such as:
+
+> "My washing machine stopped working"
+
+The request is sent to the reasoning model Amazon Nova 2 Lite.
+
+Nova analyzes the request and extracts structured search information.
+
+Example output:
+
+```json
+{
+  "serviceTitle": "appliance repair",
+  "category": "home repair",
+  "keywords": ["washing machine", "repair", "appliance"]
+}
+```
+
+This structured data allows the backend to perform a precise search in the database.
+
+---
+
+# 2. Voice Input Processing
+
+If the user records a voice message, the system captures the audio using the browser’s recording API and uploads it to the backend.
+
+The audio is processed using Amazon Nova 2 Sonic, which converts speech into text.
+
+Example transcription:
+
+> "My air conditioner is not cooling."
+
+The transcribed text is then passed to Nova 2 Lite to extract the structured service request, just like a typed query.
+
+---
+
+# 3. Image Input Processing
+
+When a user uploads an image of a problem, the system analyzes the visual content using Amazon Nova Multimodal Embeddings.
+
+The model identifies relevant objects and issues within the image.
+
+Example:
+
+Image: leaking pipe under a sink
+
+AI interpretation:
+
+> "Leaking water pipe under kitchen sink."
+
+This description is then sent to Nova 2 Lite to generate the structured search query:
+
+```json
+{
+  "serviceTitle": "plumber",
+  "category": "home repair",
+  "keywords": ["pipe", "leak", "sink"]
+}
+```
+
+---
+
+# 4. Video Input Processing
+
+For video uploads, the system performs two processing steps.
+
+First, the backend extracts a few **key frames** from the video using FFmpeg. These frames are analyzed as images to identify the visual problem.
+
+Second, if the video contains audio, the system extracts the audio track and transcribes it using Nova 2 Sonic.
+
+Example video:
+
+User records a video of a leaking pipe and says:
+
+> "This pipe is leaking under the sink."
+
+Processing pipeline:
+
+Video Upload
+↓
+Frame Extraction (FFmpeg)
+↓
+Image Analysis (Multimodal Model)
+↓
+Audio Extraction
+↓
+Speech-to-Text (Nova Sonic)
+
+The system combines both results to produce a text description of the problem.
+
+Example combined description:
+
+> "Leaking pipe under kitchen sink."
+
+This description is then sent to Nova 2 Lite to generate the structured service request.
+
+---
+
+# Converting AI Understanding into Local Results
+
+Once the AI extracts the structured service request, the backend performs a **geospatial search** in MongoDB.
+
+The database stores service providers with geographic coordinates using a **2dsphere index**.
+
+Example query:
+
+```
+Find approved services
+where category = "plumber"
+within 5km of the user's location
+sorted by nearest distance
+```
+
+This allows the platform to return the **closest relevant service providers instantly**.
+
+---
+
+# Real-Time Results for the User
+
+After the search completes:
+
+• Results appear on an interactive map
+• Each provider is shown as a location marker
+• Users can contact providers instantly via phone or WhatsApp
+
+The system also shows the AI interpretation to the user.
+
+Example:
+
+**AI detected: Plumbing issue**
+Showing plumbers near you.
+
+---
+
+# Why This Approach Works
+
+This architecture enables a natural and intuitive way for users to find local help.
+
+Instead of manually browsing categories or guessing keywords, users can simply **show or describe their problem**, and the system automatically connects them with nearby professionals who can solve it.
+
+By combining **multimodal AI understanding with precise geospatial search**, NeryByService transforms real-world problems into immediate local solutions.
+
+---
+
+If you'd like, I can also help you create a **simple architecture diagram for this pipeline** (something like a clean visual flow). That kind of diagram **dramatically improves hackathon submissions and GitHub READMEs** because judges understand the system in seconds.
+
+
+#  The Bigger Vision
+
+NeryByService bridges the gap between **digital search and real-world problems**.
+
+By combining AI understanding with hyper-local service discovery, it enables a future where people no longer need to search through directories or guess service categories.
+
+Instead, they simply show the problem—and the right help appears nearby.
+
+In essence, NeryByService becomes **the AI-powered gateway between everyday problems and real-world solutions.**

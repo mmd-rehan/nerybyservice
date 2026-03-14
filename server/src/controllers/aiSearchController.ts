@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { extractSearchParameters } from '../services/novaTextService';
 import { analyzeImage } from '../services/novaImageService';
 import { transcribeAudio } from '../services/novaVoiceService';
+import { processVideo } from '../services/novaVideoService';
 import Service from '../models/Service';
 import Category from '../models/Category';
 
@@ -27,7 +28,11 @@ export const handleAiSearch = async (req: Request, res: Response): Promise<void>
         let finalQueryText = query || "";
 
         try {
-            if (files?.image && files.image[0]) {
+            if (files?.video && files.video[0]) {
+                const videoFile = files.video[0];
+                console.log(`Processing video upload (${videoFile.mimetype})`);
+                finalQueryText = await processVideo(videoFile.buffer, videoFile.mimetype);
+            } else if (files?.image && files.image[0]) {
                 const imageFile = files.image[0];
                 console.log(`Processing image upload (${imageFile.mimetype})`);
                 finalQueryText = await analyzeImage(imageFile.buffer, imageFile.mimetype);
@@ -40,7 +45,7 @@ export const handleAiSearch = async (req: Request, res: Response): Promise<void>
             console.error("Multimodal AI Extraction Failed:", error);
             // Fallback: use query if provided, else return error
             if (!finalQueryText) {
-                res.status(500).json({ success: false, message: 'Failed to process audio/image and no text query provided.' });
+                res.status(500).json({ success: false, message: 'Failed to process video/audio/image and no text query provided.' });
                 return;
             }
         }
