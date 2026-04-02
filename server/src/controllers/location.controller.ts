@@ -7,6 +7,8 @@ export const getUserLocation = async (req: Request, res: Response): Promise<void
         let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
         if (Array.isArray(ip)) {
             ip = ip[0];
+        } else if (typeof ip === 'string' && ip.includes(',')) {
+            ip = ip.split(',')[0].trim();
         }
 
         // Handle local development where IP might be ::1 or 127.0.0.1
