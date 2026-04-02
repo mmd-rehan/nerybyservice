@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-const iplocate = require('node-iplocate');
+import { IPLocate } from 'node-iplocate';
 import redisClient from '../config/redisClient';
 
 export const getUserLocation = async (req: Request, res: Response): Promise<void> => {
@@ -30,7 +30,8 @@ export const getUserLocation = async (req: Request, res: Response): Promise<void
         }
 
         // If not in cache, fetch from node-iplocate
-        const result = await iplocate(ip, { api_key: process.env.IP_LOCATE_KEY });
+        const locator = new IPLocate(process.env.IP_LOCATE_KEY || "");
+        const result = await locator.lookup(ip);
 
         if (result && result.latitude && result.longitude) {
             // Cache the result for 24 hours (86400 seconds)
