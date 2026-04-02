@@ -239,7 +239,7 @@ export const SearchHero: FC<SearchHeroProps> = ({ onSearch, onAiSearch }) => {
                             value={aiSearchText}
                             onChange={(e) => setAiSearchText(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleAiSearchSubmit()}
-                            className="block w-full pl-11 pr-[210px] py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium"
+                            className="block w-full pl-11 pr-[210px] py-4 bg-white border-2 border-amber-200 rounded-2xl focus:ring-4 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-md text-gray-900 placeholder-gray-400 font-medium text-xs sm:text-base"
                             placeholder="Describe the help you need... e.g. My sink is leaking"
                         />
                         
